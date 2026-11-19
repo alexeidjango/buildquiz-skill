@@ -1,0 +1,27 @@
+# kviz.toml: settings of one quiz (annotated example, ZRM Kolokvijum 2).
+# Regexes go in single quotes (TOML literal strings): in "double quotes" \b becomes a backspace.
+
+title = "ZRM K2"                    # <title>, short
+naslov = "ZRM"                      # h1
+podnaslov = "Kolokvijum 2"          # next to the h1
+uvod = "Zaštita u računarskim mrežama, K2: ... Pitanje nosi poen samo ako je izbor tačan u celosti."  # lede paragraph
+kljuc_skladista = "zrmk2-v1"        # localStorage key for progress; bump when question ids change
+izlaz = "kviz_zrm_k2.html"          # built file, must end in .html
+izvor = '\bP[567]\b|[Oo]pšte znanje'  # every why must match this (unless the question has van=True)
+                                    #   slides: '\bP[234]\b'   book pages: 'стр\. \d+'
+                                    #   add '|[Oo]pšte znanje' if wrong options may be explained from general knowledge
+pismo = "lat"                       # optional: "lat" (default) or "cyr" (Serbian Cyrillic screens)
+# oznaka_van = "van slajdova"       # optional: tag on van=True questions (cyr default: "ван ових страна")
+# latinica_dozvoljena = ["n", "2n"] # optional, cyr only: Latin tokens allowed in visible text
+artifact = ""                       # filled in after the first publish; rebuilds publish to this URL
+
+[oblasti]                           # 2 to 7 areas; one uppercase ASCII letter each; order = button order
+K = "Kriptografija"
+V = "VPN i IPsec"
+B = "Bežične mreže"
+
+[simulacija]
+prolaz = 15                         # optional: pass mark. Without it the third mode is the learning check
+                                    #   "Provera znanja" (score + message, no pass/fail)
+broj = 30                           # either broj: N random questions from the whole bank ...
+# sastav = { K = 10, V = 10, B = 10 }  # ... or sastav: a fixed number per area (not both)

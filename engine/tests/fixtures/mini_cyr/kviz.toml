@@ -1,0 +1,15 @@
+title = "Мини квиз"
+naslov = "Мини"
+podnaslov = "Пробни квиз"
+uvod = "Мали квиз за тестове."
+kljuc_skladista = "minicyr-v1"
+izlaz = "kviz_mini_cyr.html"
+izvor = 'стр\. \d+'
+pismo = "cyr"
+
+[oblasti]
+A = "Прва област"
+B = "Друга област"
+
+[simulacija]
+broj = 3
