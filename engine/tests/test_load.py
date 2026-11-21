@@ -121,7 +121,10 @@ def test_area_filter_is_case_insensitive_and_validated():
             load_quiz(MINI, areas=bad)
 
 
-@pytest.mark.parametrize("edit, field", [('language = "xx"', "language"), ('content_language = "Serbian!"', "content_language")])
+@pytest.mark.parametrize("edit, field", [
+    ('language = "xx"', "language"), ('content_language = "Serbian!"', "content_language"),
+    ('content_language = "en-x"', "content_language"), ('content_language = "en-abcdefghi"', "content_language"),
+    ('content_language = "en\\n"', "content_language")])
 def test_language_config_errors(tmp_path, edit, field):
     q = copy_quiz(MINI, tmp_path / "q")
     if field == "language":

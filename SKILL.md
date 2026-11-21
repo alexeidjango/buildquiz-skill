@@ -103,6 +103,8 @@ Show:
   language;
 - the questions' language and script (`content_language`, from the sources), and whether the Cyrillic-only
   check applies (`cyrillic_only = true` for Cyrillic sources);
+- for a book or other non-slide source: the tag for off-source questions (`off_source_label`, e.g.
+  „ван ових страна“ / "not in these pages"), since the default tag says "not on the slides";
 - the areas (2 to 7, one uppercase ASCII letter each, with a label) and the simulation (N random
   questions, or a fixed mix per area); for an exam a cap on the bank size if wanted;
 - the quiz folder (`<subject>/quiz-<slug>`) and title.

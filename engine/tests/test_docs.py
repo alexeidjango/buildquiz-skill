@@ -34,3 +34,8 @@ def test_checkpoint_asks_language():
 
 def test_readme_explains_adding_a_language():
     assert "## Adding a screen language" in README and "en.json" in README
+
+
+def test_book_quizzes_set_off_source_label():
+    steps = SKILL_MD[SKILL_MD.index("### 2."):SKILL_MD.index("### 4.")]
+    assert "off_source_label" in steps and "book" in steps.lower()

@@ -139,9 +139,9 @@
     color: var(--ink);
     border-radius: 8px;
     height: 32px;
-    max-width: 108px;
-    padding: 0 6px;
-    font: inherit; font-size: .85rem; font-weight: 600;
+    max-width: 112px;
+    padding: 0 4px;
+    font: inherit; font-size: 16px; font-weight: 600;  /* under 16 px, iOS zooms the page when it is tapped */
     cursor: pointer;
   }
   .themebtn {
@@ -534,7 +534,12 @@ function tr(key, vars) {
 /* Screen text inside HTML built from strings: marked with the screen language (the page root has the
    language of the questions). */
 function L(text) {
-  return '<span lang="' + LANG + '">' + text + '</span>';
+  return '<span lang="' + LANG + '">' + escapeHtml(text) + '</span>';
+}
+
+/* Lower case by the rules of the questions' language; a tag the browser does not know falls back to plain. */
+function lower(s) {
+  try { return s.toLocaleLowerCase(CFG.contentLanguage); } catch (e) { return s.toLowerCase(); }
 }
 
 function simDesc() {
@@ -542,7 +547,7 @@ function simDesc() {
   if (CFG.mix) {
     const n = Object.values(CFG.mix).reduce((x, y) => x + y, 0);
     const mix = Object.keys(CFG.areas).filter((g) => g in CFG.mix)
-      .map((g) => CFG.mix[g] + ' ' + CFG.areas[g].toLocaleLowerCase(CFG.contentLanguage)).join(' + ');
+      .map((g) => CFG.mix[g] + ' ' + lower(CFG.areas[g])).join(' + ');
     parts.push(tr('simMix', { n, parts: mix }));
   } else {
     parts.push(tr('simRandom', { n: CFG.count }));
@@ -772,7 +777,7 @@ function isOk(a) {
 
 function imgHtml(q) {
   if (!q.img || !IMG[q.img]) return '';
-  return '<figure class="qimg"><img src="' + IMG[q.img] + '" alt="' + T.imageAlt + '"></figure>';
+  return '<figure class="qimg"><img src="' + IMG[q.img] + '" alt="' + escapeHtml(T.imageAlt) + '"></figure>';
 }
 
 function renderQuestion() {
@@ -836,7 +841,7 @@ function explainHtml(q, picked, order, bold) {
   if (q.note) h += '<p class="note">' + escapeHtml(q.note) + '</p>';
   const others = order.map((j, pos) =>
     '<div' + (q.ok.includes(j) ? ' class="is-ok"' : '') + '><b>' + LETTERS[pos] + ')</b> ' + escapeHtml(q.opts[j].why) + '</div>').join('');
-  h += '<p><button class="linkbtn" type="button" lang="' + LANG + '" data-toggle="other">' + T.showAll + '</button></p>' +
+  h += '<p><button class="linkbtn" type="button" lang="' + LANG + '" data-toggle="other">' + escapeHtml(T.showAll) + '</button></p>' +
     '<div class="other hide">' + others + '</div></div>';
   return h;
 }
@@ -1123,6 +1128,8 @@ async function selfTest() {
       assert(document.querySelector('#quiz pre.code'), 'code block not rendered');
       code = 1;
     }
+    step = 'lang-menu';
+    assert(parseFloat(getComputedStyle($('langPick')).fontSize) >= 16, 'language menu font under 16 px (iOS zooms the page on tap)');
     step = 'lang-fallback';
     const codes = languageCodes();
     const last = codes[codes.length - 1];

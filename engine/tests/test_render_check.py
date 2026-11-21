@@ -181,3 +181,24 @@ def test_missing_result_line_is_retried_once(monkeypatch, tmp_path):
     outputs = iter(["<html></html>", "<html></html>"])
     with pytest.raises(RuntimeError):
         render_check.render(tmp_path / "x.html")
+
+
+def test_language_strings_are_escaped(tmp_path, monkeypatch):
+    import json
+    import shutil
+    import build
+    import load
+    lang = tmp_path / "lang"
+    shutil.copytree(load.LANG_DIR, lang)
+    en = json.loads((lang / "en.json").read_text(encoding="utf-8"))
+    en["strings"]["whyNot"] = "<i>Why not:"
+    en["strings"]["imageAlt"] = 'picture "for" <the> question'
+    (lang / "en.json").write_text(json.dumps(en, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(load, "LANG_DIR", lang)
+    monkeypatch.setattr(build, "LANG_DIR", lang)
+    q = copy_quiz(MINI, tmp_path / "q")
+    s = (q / "quiz.toml").read_text(encoding="utf-8").replace('language = "sr-Latn"', 'language = "en"')
+    (q / "quiz.toml").write_text(s, encoding="utf-8")
+    dom = dump_dom(build_quiz(tmp_path, q), "#shot=question")
+    assert "&lt;i&gt;Why not:" in dom
+    assert 'alt="picture &quot;for&quot; &lt;the&gt; question"' in dom

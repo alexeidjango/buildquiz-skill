@@ -12,7 +12,7 @@ from bank_api import normalize
 ENGINE = Path(__file__).resolve().parent
 LANG_DIR = ENGINE / "lang"
 REQUIRED = ("title", "heading", "subtitle", "intro", "storage_key", "output", "citation")
-LANGUAGE_TAG = re.compile(r"^[a-z]{2,3}(-[A-Za-z0-9]+)*$")
+LANGUAGE_TAG = re.compile(r"[a-z]{2,3}(-[A-Za-z0-9]{2,8})*")  # used with fullmatch; subtags as BCP 47 sizes them
 QUIZ_MODULES = ("bank", "terms", "items")
 
 
@@ -56,7 +56,7 @@ def validate_config(cfg: dict) -> dict:
         raise QuizError(f"language: {language!r} has no file in engine/lang/; available: "
                         f"{', '.join(available_languages())}")
     content = cfg.setdefault("content_language", language)
-    if not isinstance(content, str) or not LANGUAGE_TAG.match(content):
+    if not isinstance(content, str) or not LANGUAGE_TAG.fullmatch(content):
         raise QuizError(f"content_language: {content!r} is not a language tag such as \"sr-Cyrl\" or \"en\"")
     if not isinstance(cfg.setdefault("cyrillic_only", False), bool):
         raise QuizError("cyrillic_only: must be true or false")
