@@ -13,6 +13,18 @@ from the pages (with labels replaced by numbers), code snippets, an area filter,
 and screens in English, Serbian (Latin or Cyrillic) or Russian, switchable on the start screen; more
 languages are one file each. Progress stays on the phone.
 
+<p>
+  <img src="docs/screenshots/start-light.jpg" width="260" alt="Start screen: mode, area and options">
+  <img src="docs/screenshots/question-light.jpg" width="260" alt="A picture question answered wrong, with explanations">
+  <img src="docs/screenshots/results-light.jpg" width="260" alt="Exam simulation result: 8 of 10, passed">
+</p>
+
+The same screens in the [dark theme](docs/screenshots/start-dark.jpg)
+([question](docs/screenshots/question-dark.jpg), [results](docs/screenshots/results-dark.jpg)), and the
+start screen [switched to Serbian Cyrillic](docs/screenshots/start-sr-Cyrl.jpg). They come from the demo
+quiz in [`examples/demo-quiz/`](examples/demo-quiz), a complete worked example of a quiz folder; run
+`python docs/screenshots/make.py` to regenerate them.
+
 ## Requirements
 
 - Claude Code, with the Artifact tool (to publish the quiz).

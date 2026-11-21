@@ -168,6 +168,7 @@
     font-size: .8rem; color: var(--muted); margin-top: 6px;
     font-variant-numeric: tabular-nums;
   }
+  .meta[hidden] { display: none; }
 
   /* panels and choices */
   .stack { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
@@ -1029,6 +1030,38 @@ setLanguage(pickLanguage(savedLanguage(), languageCodes(), CFG.language));
 applyTheme(store.get()._theme);
 refreshStats();
 
+/* ---------- screenshot states (docs/screenshots/make.py opens #shot=<start|question|results>[&lang=][&theme=]) ---------- */
+function showShot(params) {
+  store.set = () => {};  /* a screenshot never writes progress */
+  if (params.get('theme')) applyTheme(params.get('theme'));
+  if (params.get('lang')) setLanguage(params.get('lang'));
+  const shot = params.get('shot');
+  if (shot === 'question') {
+    start('learn', 'all');
+    const q = BANK.find((x) => x.img) || BANK[0];
+    state.queue = [q, ...state.queue.filter((x) => x !== q)];
+    state.i = 0;
+    renderQuestion();
+    const wrongOpt = [...$('opts').querySelectorAll('.opt')].find((b) => !q.ok.includes(Number(b.dataset.i)));
+    wrongOpt.click();
+    $('actionBtn').click();
+  } else if (shot === 'results') {
+    start('sim', 'all');
+    for (let i = 0; state && $('results').classList.contains('hide'); i++) {
+      const q = state.queue[state.i];
+      const right = i < state.queue.length - 2;
+      for (const b of $('opts').querySelectorAll('.opt')) {
+        const j = Number(b.dataset.i);
+        if (right ? q.ok.includes(j) : j === q.opts.findIndex((_, k) => !q.ok.includes(k))) b.click();
+      }
+      $('actionBtn').click();
+    }
+  }
+  window.scrollTo(0, 0);
+}
+
+if (location.hash.startsWith('#shot=')) showShot(new URLSearchParams(location.hash.slice(1)));
+
 /* ---------- self-test (render_check.py opens the page with #selftest) ---------- */
 async function selfTest() {
   let step = 'counts';
@@ -1060,6 +1093,7 @@ async function selfTest() {
       : Math.min(CFG.count, BANK.length);
     const res = document.querySelector('#results .score-big');
     assert(res, 'no result screen');
+    assert(getComputedStyle($('metaRow')).display === 'none', 'question counter still shown on the result screen');
     const m = res.textContent.match(/^(\d+) \/ (\d+)$/);
     assert(m && Number(m[2]) === expected, 'score "' + res.textContent + '", expected / ' + expected);
 

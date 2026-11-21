@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# built demo page (regenerate with engine/build.py)
+examples/demo-quiz/*.html
