@@ -1,0 +1,16 @@
+title = "Мини квиз"
+heading = "Мини"
+subtitle = "Пробни квиз"
+intro = "Мали квиз за тестове."
+storage_key = "minicyr-v1"
+output = "quiz_mini_cyr.html"
+citation = 'стр\. \d+'
+language = "sr-Cyrl"
+cyrillic_only = true
+
+[areas]
+A = "Прва област"
+B = "Друга област"
+
+[simulation]
+count = 3

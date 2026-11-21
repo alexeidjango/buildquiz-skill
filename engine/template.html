@@ -101,7 +101,7 @@
     min-width: 0;
   }
 
-  /* zaglavlje */
+  /* header */
   header {
     position: sticky;
     top: env(safe-area-inset-top, 0px);
@@ -158,7 +158,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* paneli i izbori */
+  /* panels and choices */
   .stack { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
   .panel {
     background: var(--surface);
@@ -243,7 +243,7 @@
   }
   .stat span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 
-  /* kartica pitanja */
+  /* question card */
   .qcard {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -259,7 +259,7 @@
     padding: 3px 8px; border-radius: 999px;
     background: var(--accent-wash); color: var(--accent-ink);
   }
-  .tag.van { background: var(--surface-2); color: var(--warn); border: 1px solid var(--warn); }
+  .tag.off { background: var(--surface-2); color: var(--warn); border: 1px solid var(--warn); }
   .tag.plain { background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); }
   .qtext { font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin: 0 0 12px; text-wrap: pretty; }
   .code {
@@ -365,7 +365,7 @@
   .other div { padding-left: 10px; border-left: 2px solid var(--border-strong); }
   .other div.is-ok { border-left-color: var(--good); }
 
-  /* donja traka */
+  /* bottom bar */
   .bar {
     position: fixed; left: 0; right: 0; bottom: 0;
     z-index: 30;
@@ -379,7 +379,7 @@
   .bar .btn { flex: 1; }
   .bar .btn.ghost { flex: 0 0 34%; }
 
-  /* rezultati */
+  /* results */
   .score-big {
     font-family: "Montserrat", sans-serif;
     font-weight: 700; font-size: 3rem; line-height: 1;
@@ -419,10 +419,10 @@
 <div class="wrap">
   <header>
     <div class="titlerow">
-      <h1>__NASLOV__ · <span>__PODNASLOV__</span></h1>
+      <h1>__HEADING__ · <span>__SUBTITLE__</span></h1>
       <div class="headbtns">
-        <button class="quitbtn" id="quitBtn" type="button" hidden data-t="prekini"></button>
-        <button class="themebtn" id="themeBtn" type="button" data-t-attr="tema">◐</button>
+        <button class="quitbtn" id="quitBtn" type="button" hidden data-t="quit"></button>
+        <button class="themebtn" id="themeBtn" type="button" data-t-attr="theme">◐</button>
       </div>
     </div>
     <div class="progress-track" id="progWrap" hidden><div class="progress-fill" id="progFill"></div></div>
@@ -431,42 +431,42 @@
 
   <section id="setup" class="stack">
     <div class="panel">
-      <p class="lede">__UVOD__</p>
+      <p class="lede">__INTRO__</p>
 
-      <div class="grouplabel" data-t="rezim"></div>
+      <div class="grouplabel" data-t="mode"></div>
       <div class="choicegrid" id="modePick">
-        <button class="choice" type="button" data-shape="radio" data-val="learn" aria-pressed="true"><span class="mark"></span><span class="ctext"><span data-t="uci"></span> <span class="csub" data-t="uciOpis"></span></span></button>
-        <button class="choice" type="button" data-shape="radio" data-val="drill" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="ponovi"></span> <span class="csub" data-t="ponoviOpis"></span></span></button>
-        <button class="choice" type="button" data-shape="radio" data-val="sim" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="simMode"></span> <span class="csub">__SIM_OPIS__</span></span></button>
+        <button class="choice" type="button" data-shape="radio" data-val="learn" aria-pressed="true"><span class="mark"></span><span class="ctext"><span data-t="learn"></span> <span class="csub" data-t="learnDesc"></span></span></button>
+        <button class="choice" type="button" data-shape="radio" data-val="drill" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="drill"></span> <span class="csub" data-t="drillDesc"></span></span></button>
+        <button class="choice" type="button" data-shape="radio" data-val="sim" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="simMode"></span> <span class="csub">__SIM_DESC__</span></span></button>
       </div>
 
-      <div class="grouplabel" data-t="oblast"></div>
+      <div class="grouplabel" data-t="area"></div>
       <div class="choicegrid two" id="areaPick">
-__OBLASTI__
+__AREAS__
       </div>
 
-      <div class="grouplabel" data-t="opcije"></div>
+      <div class="grouplabel" data-t="options"></div>
       <div class="choicegrid">
-        <button class="choice" type="button" id="shuffleOpt" data-shape="check" aria-pressed="true"><span class="mark"></span><span class="ctext" data-t="mesaj"></span></button>
+        <button class="choice" type="button" id="shuffleOpt" data-shape="check" aria-pressed="true"><span class="mark"></span><span class="ctext" data-t="shuffle"></span></button>
       </div>
 
       <div style="height:16px"></div>
-      <button class="btn" type="button" id="startBtn" data-t="pocni"></button>
+      <button class="btn" type="button" id="startBtn" data-t="start"></button>
     </div>
 
     <div class="panel">
-      <div class="grouplabel first" data-t="napredak"></div>
+      <div class="grouplabel first" data-t="progress"></div>
       <div class="statgrid">
-        <div class="stat"><b id="sSeen">0</b><span data-t="uradjeno"></span></div>
-        <div class="stat"><b id="sMastered">0</b><span data-t="tacnoStat"></span></div>
-        <div class="stat"><b id="sWeak">0</b><span data-t="zaPonavljanje"></span></div>
+        <div class="stat"><b id="sSeen">0</b><span data-t="doneStat"></span></div>
+        <div class="stat"><b id="sMastered">0</b><span data-t="masteredStat"></span></div>
+        <div class="stat"><b id="sWeak">0</b><span data-t="weakStat"></span></div>
       </div>
       <div id="resetWrap">
-        <button class="btn ghost small" type="button" id="resetBtn" data-t="obrisi"></button>
+        <button class="btn ghost small" type="button" id="resetBtn" data-t="reset"></button>
       </div>
       <div class="btnrow hide" id="resetConfirm">
-        <button class="btn ghost small" type="button" id="resetNo" data-t="neZadrzi"></button>
-        <button class="btn danger small" type="button" id="resetYes" data-t="daObrisi"></button>
+        <button class="btn ghost small" type="button" id="resetNo" data-t="resetNo"></button>
+        <button class="btn danger small" type="button" id="resetYes" data-t="resetYes"></button>
       </div>
     </div>
 
@@ -479,17 +479,17 @@ __OBLASTI__
 
 <div class="bar hide" id="bar">
   <div class="bar-inner">
-    <button class="btn ghost" type="button" id="skipBtn" data-t="preskoci"></button>
-    <button class="btn" type="button" id="actionBtn" data-t="proveri"></button>
+    <button class="btn ghost" type="button" id="skipBtn" data-t="skip"></button>
+    <button class="btn" type="button" id="actionBtn" data-t="check"></button>
   </div>
 </div>
 </div>
 
 <script id="bank" type="application/json">
-__BANKA__
+__BANK__
 </script>
-<script id="slike" type="application/json">
-__SLIKE__
+<script id="images" type="application/json">
+__IMAGES__
 </script>
 
 <script>
@@ -497,67 +497,67 @@ if (location.hash === '#selftest-nostorage') {
   Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } });
 }
 const BANK = JSON.parse(document.getElementById('bank').textContent);
-const IMG = JSON.parse(document.getElementById('slike').textContent);
-const CFG = __PODESAVANJA__;
+const IMG = JSON.parse(document.getElementById('images').textContent);
+const CFG = __CONFIG__;
 const T = {
-/*T.lat*/ lat: {
-  prekini: 'Prekini', tema: 'Promeni temu', rezim: 'Režim', oblast: 'Oblast', opcije: 'Opcije',
-  uci: 'Uči', uciOpis: 'sva pitanja iz oblasti, objašnjenje odmah posle svakog',
-  ponovi: 'Ponovi greške', ponoviOpis: 'samo pogrešena i neurađena pitanja',
-  simIspit: 'Simulacija kolokvijuma', simKratko: 'Simulacija', simUcenje: 'Provera znanja',
-  mesaj: 'Mešaj redosled odgovora', pocni: 'Počni', napredak: 'Tvoj napredak',
-  uradjeno: 'urađeno', tacnoStat: 'tačno', zaPonavljanje: 'za ponavljanje', obrisi: 'Obriši napredak',
-  neZadrzi: 'Ne, zadrži', daObrisi: 'Da, obriši sve',
+/*T.sr-Latn*/ 'sr-Latn': {
+  quit: 'Prekini', theme: 'Promeni temu', mode: 'Režim', area: 'Oblast', options: 'Opcije',
+  learn: 'Uči', learnDesc: 'sva pitanja iz oblasti, objašnjenje odmah posle svakog',
+  drill: 'Ponovi greške', drillDesc: 'samo pogrešena i neurađena pitanja',
+  simExam: 'Simulacija kolokvijuma', simShort: 'Simulacija', simCheck: 'Provera znanja',
+  shuffle: 'Mešaj redosled odgovora', start: 'Počni', progress: 'Tvoj napredak',
+  doneStat: 'urađeno', masteredStat: 'tačno', weakStat: 'za ponavljanje', reset: 'Obriši napredak',
+  resetNo: 'Ne, zadrži', resetYes: 'Da, obriši sve',
   foot: 'Napredak se čuva samo na ovom uređaju. Na telefonu: Podeli → Dodaj na početni ekran.',
-  preskoci: 'Preskoči', proveri: 'Proveri', zavrsi: 'Završi', dalje: 'Dalje',
-  pitanja: (n) => (n % 10 === 1 && n % 100 !== 11 ? 'pitanje' : 'pitanja'),
-  praznoNaslov: 'Nema grešaka za ponavljanje',
-  praznoTekst: (ispit) => 'Sva pitanja iz ove oblasti su poslednji put rešena tačno. Izaberi „Uči“ za ceo krug ili probaj ' +
-    (ispit ? 'simulaciju kolokvijuma.' : 'proveru znanja.'),
-  nazad: 'Nazad na početak', slikaAlt: 'slika uz pitanje', pitanje: 'Pitanje', prolaz: 'prolaz', tacnoMeta: 'tačno',
-  visetacnih: 'Više tačnih. Označi sve tačne.', jedantacan: 'Jedan tačan odgovor.',
-  tacno: 'Tačno', netacno: 'Netačno', netacnoIspit: 'Netačno, 0 poena', bezOdgovora: 'Bez odgovora',
-  zastoNe: 'Zašto ne:', trebaloJe: 'Trebalo je:', prikaziSve: 'Prikaži objašnjenja za sve odgovore',
-  sakrij: 'Sakrij objašnjenja', vTacno: 'tačno', vTrebalo: 'trebalo', vIzbor: 'tvoj izbor',
-  tvojOdgovor: 'Tvoj odgovor: ', bezOdgovoraMalo: 'bez odgovora', tacnoDvotacka: 'Tačno: ',
-  polozeno: 'Položeno.', nijePolozeno: 'Nije položeno.', zaProlaz: (n) => 'Za prolaz treba ' + n + ' tačnih.',
-  novaSim: 'Nova simulacija', novaProvera: 'Nova provera', pocetniEkran: 'Početni ekran',
-  krajKruga: 'kraj kruga', zaPonavljanjeN: 'Za ponavljanje: ',
-  preskocena: 'Preskočena pitanja se ne računaju kao urađena.', sveTacno: 'Sve tačno.',
-  poruke: ['Odlično!', 'Vrlo dobro.', 'Dobro. Ponovi greške.', 'Ponovi gradivo, pa probaj ponovo.'],
-  slova: 'abcdefgh',
-}, /*T.lat end*/
-/*T.cyr*/ cyr: {
-  prekini: 'Прекини', tema: 'Промени тему', rezim: 'Режим', oblast: 'Област', opcije: 'Опције',
-  uci: 'Учи', uciOpis: 'сва питања из области, објашњење одмах после сваког',
-  ponovi: 'Понови грешке', ponoviOpis: 'само погрешена и неурађена питања',
-  simIspit: 'Симулација колоквијума', simKratko: 'Симулација', simUcenje: 'Провера знања',
-  mesaj: 'Мешај редослед одговора', pocni: 'Почни', napredak: 'Твој напредак',
-  uradjeno: 'урађено', tacnoStat: 'тачно', zaPonavljanje: 'за понављање', obrisi: 'Обриши напредак',
-  neZadrzi: 'Не, задржи', daObrisi: 'Да, обриши све',
+  skip: 'Preskoči', check: 'Proveri', finish: 'Završi', next: 'Dalje',
+  questions: (n) => (n % 10 === 1 && n % 100 !== 11 ? 'pitanje' : 'pitanja'),
+  emptyTitle: 'Nema grešaka za ponavljanje',
+  emptyText: (exam) => 'Sva pitanja iz ove oblasti su poslednji put rešena tačno. Izaberi „Uči“ za ceo krug ili probaj ' +
+    (exam ? 'simulaciju kolokvijuma.' : 'proveru znanja.'),
+  back: 'Nazad na početak', imageAlt: 'slika uz pitanje', question: 'Pitanje', passMark: 'prolaz', correctSoFar: 'tačno',
+  multiHint: 'Više tačnih. Označi sve tačne.', singleHint: 'Jedan tačan odgovor.',
+  correct: 'Tačno', wrong: 'Netačno', wrongExam: 'Netačno, 0 poena', noAnswer: 'Bez odgovora',
+  whyNot: 'Zašto ne:', shouldBe: 'Trebalo je:', showAll: 'Prikaži objašnjenja za sve odgovore',
+  hideAll: 'Sakrij objašnjenja', vCorrect: 'tačno', vMissed: 'trebalo', vPicked: 'tvoj izbor',
+  yourAnswer: 'Tvoj odgovor: ', noAnswerLower: 'bez odgovora', correctColon: 'Tačno: ',
+  passed: 'Položeno.', failed: 'Nije položeno.', passNeeded: (n) => 'Za prolaz treba ' + n + ' tačnih.',
+  newSim: 'Nova simulacija', newCheck: 'Nova provera', home: 'Početni ekran',
+  endOfRound: 'kraj kruga', toRepeat: 'Za ponavljanje: ',
+  skippedNote: 'Preskočena pitanja se ne računaju kao urađena.', allCorrect: 'Sve tačno.',
+  messages: ['Odlično!', 'Vrlo dobro.', 'Dobro. Ponovi greške.', 'Ponovi gradivo, pa probaj ponovo.'],
+  letters: 'abcdefgh',
+}, /*T.sr-Latn end*/
+/*T.sr-Cyrl*/ 'sr-Cyrl': {
+  quit: 'Прекини', theme: 'Промени тему', mode: 'Режим', area: 'Област', options: 'Опције',
+  learn: 'Учи', learnDesc: 'сва питања из области, објашњење одмах после сваког',
+  drill: 'Понови грешке', drillDesc: 'само погрешена и неурађена питања',
+  simExam: 'Симулација колоквијума', simShort: 'Симулација', simCheck: 'Провера знања',
+  shuffle: 'Мешај редослед одговора', start: 'Почни', progress: 'Твој напредак',
+  doneStat: 'урађено', masteredStat: 'тачно', weakStat: 'за понављање', reset: 'Обриши напредак',
+  resetNo: 'Не, задржи', resetYes: 'Да, обриши све',
   foot: 'Напредак се чува само на овом уређају. На телефону: Подели → Додај на почетни екран.',
-  preskoci: 'Прескочи', proveri: 'Провери', zavrsi: 'Заврши', dalje: 'Даље',
-  pitanja: (n) => (n % 10 === 1 && n % 100 !== 11 ? 'питање' : 'питања'),
-  praznoNaslov: 'Нема грешака за понављање',
-  praznoTekst: (ispit) => 'Сва питања из ове области су последњи пут решена тачно. Изабери „Учи“ за цео круг или пробај ' +
-    (ispit ? 'симулацију колоквијума.' : 'проверу знања.'),
-  nazad: 'Назад на почетак', slikaAlt: 'слика уз питање', pitanje: 'Питање', prolaz: 'пролаз', tacnoMeta: 'тачно',
-  visetacnih: 'Више тачних. Означи све тачне.', jedantacan: 'Један тачан одговор.',
-  tacno: 'Тачно', netacno: 'Нетачно', netacnoIspit: 'Нетачно, 0 поена', bezOdgovora: 'Без одговора',
-  zastoNe: 'Зашто не:', trebaloJe: 'Требало је:', prikaziSve: 'Прикажи објашњења за све одговоре',
-  sakrij: 'Сакриј објашњења', vTacno: 'тачно', vTrebalo: 'требало', vIzbor: 'твој избор',
-  tvojOdgovor: 'Твој одговор: ', bezOdgovoraMalo: 'без одговора', tacnoDvotacka: 'Тачно: ',
-  polozeno: 'Положено.', nijePolozeno: 'Није положено.', zaProlaz: (n) => 'За пролаз треба ' + n + ' тачних.',
-  novaSim: 'Нова симулација', novaProvera: 'Нова провера', pocetniEkran: 'Почетни екран',
-  krajKruga: 'крај круга', zaPonavljanjeN: 'За понављање: ',
-  preskocena: 'Прескочена питања се не рачунају као урађена.', sveTacno: 'Све тачно.',
-  poruke: ['Одлично!', 'Врло добро.', 'Добро. Понови грешке.', 'Понови градиво, па пробај поново.'],
-  slova: 'абвгдђеж',
-}, /*T.cyr end*/
-}[CFG.pismo];
-const GROUP = CFG.oblasti;
-const LETTERS = T.slova;
-const PROLAZ = CFG.prolaz;
+  skip: 'Прескочи', check: 'Провери', finish: 'Заврши', next: 'Даље',
+  questions: (n) => (n % 10 === 1 && n % 100 !== 11 ? 'питање' : 'питања'),
+  emptyTitle: 'Нема грешака за понављање',
+  emptyText: (exam) => 'Сва питања из ове области су последњи пут решена тачно. Изабери „Учи“ за цео круг или пробај ' +
+    (exam ? 'симулацију колоквијума.' : 'проверу знања.'),
+  back: 'Назад на почетак', imageAlt: 'слика уз питање', question: 'Питање', passMark: 'пролаз', correctSoFar: 'тачно',
+  multiHint: 'Више тачних. Означи све тачне.', singleHint: 'Један тачан одговор.',
+  correct: 'Тачно', wrong: 'Нетачно', wrongExam: 'Нетачно, 0 поена', noAnswer: 'Без одговора',
+  whyNot: 'Зашто не:', shouldBe: 'Требало је:', showAll: 'Прикажи објашњења за све одговоре',
+  hideAll: 'Сакриј објашњења', vCorrect: 'тачно', vMissed: 'требало', vPicked: 'твој избор',
+  yourAnswer: 'Твој одговор: ', noAnswerLower: 'без одговора', correctColon: 'Тачно: ',
+  passed: 'Положено.', failed: 'Није положено.', passNeeded: (n) => 'За пролаз треба ' + n + ' тачних.',
+  newSim: 'Нова симулација', newCheck: 'Нова провера', home: 'Почетни екран',
+  endOfRound: 'крај круга', toRepeat: 'За понављање: ',
+  skippedNote: 'Прескочена питања се не рачунају као урађена.', allCorrect: 'Све тачно.',
+  messages: ['Одлично!', 'Врло добро.', 'Добро. Понови грешке.', 'Понови градиво, па пробај поново.'],
+  letters: 'абвгдђеж',
+}, /*T.sr-Cyrl end*/
+}[CFG.language];
+const GROUP = CFG.areas;
+const LETTERS = T.letters;
+const PASS_MARK = CFG.passMark;
 const $ = (id) => document.getElementById(id);
 
 function escapeHtml(s) {
@@ -599,16 +599,16 @@ function shuffle(a) {
   return b;
 }
 
-const KEY = CFG.kljuc;
+const KEY = CFG.storageKey;
 const store = {
   get() {
     try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
   },
   set(obj) {
-    try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) { /* napredak se ne čuva */ }
+    try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) { /* progress is not kept */ }
   },
   clear() {
-    try { localStorage.removeItem(KEY); } catch (e) { /* napredak se ne čuva */ }
+    try { localStorage.removeItem(KEY); } catch (e) { /* progress is not kept */ }
   },
 };
 
@@ -624,19 +624,19 @@ function stats(bank, st) {
 }
 
 function pickSim(bank) {
-  if (CFG.sastav) {
-    const izbor = [];
-    for (const g of Object.keys(CFG.sastav)) {
-      izbor.push(...shuffle(bank.filter((q) => q.g === g)).slice(0, CFG.sastav[g]));
+  if (CFG.mix) {
+    const chosen = [];
+    for (const g of Object.keys(CFG.mix)) {
+      chosen.push(...shuffle(bank.filter((q) => q.area === g)).slice(0, CFG.mix[g]));
     }
-    return shuffle(izbor);
+    return shuffle(chosen);
   }
-  return shuffle(bank).slice(0, CFG.broj);
+  return shuffle(bank).slice(0, CFG.count);
 }
 
 function queueFor(mode, area, bank, st) {
   if (mode === 'sim') return pickSim(bank);
-  const pool = bank.filter((q) => area === 'all' || q.g === area);
+  const pool = bank.filter((q) => area === 'all' || q.area === area);
   if (mode === 'drill') return shuffle(pool.filter((q) => !st[q.id] || st[q.id].last !== 'ok'));
   return shuffle(pool);
 }
@@ -650,7 +650,7 @@ function record(id, ok) {
   store.set(st);
 }
 
-/* ---------- početni ekran ---------- */
+/* ---------- start screen ---------- */
 function pickValue(groupId) {
   const b = $(groupId).querySelector('[aria-pressed="true"]');
   return b ? b.dataset.val : null;
@@ -677,9 +677,9 @@ function refreshStats() {
 }
 
 function refreshCounts() {
-  const n = (g) => BANK.filter((q) => g === 'all' || q.g === g).length;
-  for (const g of ['all', ...Object.keys(CFG.oblasti)]) {
-    $('cnt' + (g === 'all' ? 'All' : g)).textContent = n(g) + ' ' + T.pitanja(n(g));
+  const n = (g) => BANK.filter((q) => g === 'all' || q.area === g).length;
+  for (const g of ['all', ...Object.keys(CFG.areas)]) {
+    $('cnt' + (g === 'all' ? 'All' : g)).textContent = n(g) + ' ' + T.questions(n(g));
   }
 }
 
@@ -700,7 +700,7 @@ function goHome() {
   showScreen('setup');
 }
 
-/* ---------- tok kviza ---------- */
+/* ---------- quiz flow ---------- */
 let state = null;
 
 function start(mode, area) {
@@ -724,16 +724,16 @@ function renderEmpty() {
   showScreen('quiz');
   $('bar').classList.add('hide');
   $('quiz').innerHTML =
-    '<div class="panel empty"><p class="big">' + T.praznoNaslov + '</p>' +
-    '<p class="lede" style="margin:0 auto 16px">' + T.praznoTekst(!!PROLAZ) + '</p>' +
-    '<button class="btn" type="button" id="emptyBack">' + T.nazad + '</button></div>';
+    '<div class="panel empty"><p class="big">' + T.emptyTitle + '</p>' +
+    '<p class="lede" style="margin:0 auto 16px">' + T.emptyText(!!PASS_MARK) + '</p>' +
+    '<button class="btn" type="button" id="emptyBack">' + T.back + '</button></div>';
   $('progWrap').hidden = true;
   $('metaRow').hidden = true;
   $('emptyBack').addEventListener('click', goHome);
 }
 
 function modeLabel(mode) {
-  return { learn: T.uci, drill: T.ponovi, sim: PROLAZ ? T.simKratko : T.simUcenje }[mode];
+  return { learn: T.learn, drill: T.drill, sim: PASS_MARK ? T.simShort : T.simCheck }[mode];
 }
 
 function isOk(a) {
@@ -742,7 +742,7 @@ function isOk(a) {
 
 function imgHtml(q) {
   if (!q.img || !IMG[q.img]) return '';
-  return '<figure class="qimg"><img src="' + IMG[q.img] + '" alt="' + T.slikaAlt + '"></figure>';
+  return '<figure class="qimg"><img src="' + IMG[q.img] + '" alt="' + T.imageAlt + '"></figure>';
 }
 
 function renderQuestion() {
@@ -761,10 +761,10 @@ function renderQuestion() {
 
   $('quiz').innerHTML =
     '<article class="qcard">' +
-    '<div class="qtags"><span class="tag">' + escapeHtml(GROUP[q.g]) + '</span>' +
-    (q.van && state.mode !== 'sim' ? '<span class="tag van">' + escapeHtml(CFG.oznakaVan) + '</span>' : '') + '</div>' +
+    '<div class="qtags"><span class="tag">' + escapeHtml(GROUP[q.area]) + '</span>' +
+    (q.off_source && state.mode !== 'sim' ? '<span class="tag off">' + escapeHtml(CFG.offSourceLabel) + '</span>' : '') + '</div>' +
     '<p class="qtext">' + escapeHtml(q.q) + '</p>' + imgHtml(q) + codeHtml(q) +
-    '<p class="qhint">' + (q.multi ? T.visetacnih : T.jedantacan) + '</p>' +
+    '<p class="qhint">' + (q.multi ? T.multiHint : T.singleHint) + '</p>' +
     '<div class="opts" id="opts">' + opts + '</div>' +
     '<div id="explainBox"></div>' +
     '</article>';
@@ -784,11 +784,11 @@ function renderQuestion() {
 
   const done = state.answers.filter(isOk).length;
   $('progFill').style.width = (100 * state.i / n) + '%';
-  $('metaLeft').textContent = T.pitanje + ' ' + (state.i + 1) + ' / ' + n;
+  $('metaLeft').textContent = T.question + ' ' + (state.i + 1) + ' / ' + n;
   $('metaRight').textContent = state.mode === 'sim'
-    ? modeLabel(state.mode) + (PROLAZ ? ' · ' + T.prolaz + ' ' + PROLAZ : '')
-    : modeLabel(state.mode) + ' · ' + T.tacnoMeta + ' ' + done;
-  $('actionBtn').textContent = T.proveri;
+    ? modeLabel(state.mode) + (PASS_MARK ? ' · ' + T.passMark + ' ' + PASS_MARK : '')
+    : modeLabel(state.mode) + ' · ' + T.correctSoFar + ' ' + done;
+  $('actionBtn').textContent = T.check;
   $('actionBtn').disabled = true;
   $('skipBtn').classList.remove('hide');
   window.scrollTo(0, 0);
@@ -799,14 +799,14 @@ function explainHtml(q, picked, order, bold) {
   const wrong = picked.filter((j) => !q.ok.includes(j));
   const missed = q.ok.filter((j) => !picked.includes(j));
   let h = '<div class="explain ' + (ok ? 'ok' : 'no') + '">';
-  h += '<div class="head">' + (ok ? T.tacno : picked.length ? (PROLAZ ? T.netacnoIspit : T.netacno) : T.bezOdgovora) + '</div>';
-  for (const j of wrong) h += '<p><span class="why-not">' + T.zastoNe + '</span> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
-  if (!ok) for (const j of missed) h += '<p><b>' + T.trebaloJe + '</b> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
+  h += '<div class="head">' + (ok ? T.correct : picked.length ? (PASS_MARK ? T.wrongExam : T.wrong) : T.noAnswer) + '</div>';
+  for (const j of wrong) h += '<p><span class="why-not">' + T.whyNot + '</span> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
+  if (!ok) for (const j of missed) h += '<p><b>' + T.shouldBe + '</b> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
   if (ok) for (const j of q.ok) h += '<p>' + escapeHtml(q.opts[j].why) + '</p>';
   if (q.note) h += '<p class="note">' + escapeHtml(q.note) + '</p>';
   const others = order.map((j, pos) =>
     '<div' + (q.ok.includes(j) ? ' class="is-ok"' : '') + '><b>' + LETTERS[pos] + ')</b> ' + escapeHtml(q.opts[j].why) + '</div>').join('');
-  h += '<p><button class="linkbtn" type="button" data-toggle="other">' + T.prikaziSve + '</button></p>' +
+  h += '<p><button class="linkbtn" type="button" data-toggle="other">' + T.showAll + '</button></p>' +
     '<div class="other hide">' + others + '</div></div>';
   return h;
 }
@@ -817,7 +817,7 @@ function wireToggles(root) {
     if (!b) return;
     const box = b.closest('.explain').querySelector('.other');
     const open = box.classList.toggle('hide') === false;
-    b.textContent = open ? T.sakrij : T.prikaziSve;
+    b.textContent = open ? T.hideAll : T.showAll;
   });
 }
 
@@ -825,15 +825,15 @@ function reveal() {
   const q = state.queue[state.i];
   for (const b of $('opts').querySelectorAll('.opt')) {
     const j = Number(b.dataset.i);
-    const izabran = state.picked.has(j);
+    const isPicked = state.picked.has(j);
     b.disabled = true;
     b.setAttribute('aria-pressed', 'false');
     if (q.ok.includes(j)) {
-      b.classList.add(izabran ? 'correct' : 'missed');
-      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + (izabran ? T.vTacno : T.vTrebalo) + '</span>');
-    } else if (izabran) {
+      b.classList.add(isPicked ? 'correct' : 'missed');
+      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + (isPicked ? T.vCorrect : T.vMissed) + '</span>');
+    } else if (isPicked) {
       b.classList.add('wrong');
-      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + T.vIzbor + '</span>');
+      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + T.vPicked + '</span>');
     }
   }
   $('explainBox').innerHTML = explainHtml(q, [...state.picked], state.order, true);
@@ -850,7 +850,7 @@ function check() {
   record(q.id, isOk(a));
   reveal();
   state.checked = true;
-  $('actionBtn').textContent = state.i + 1 === state.queue.length ? T.zavrsi : T.dalje;
+  $('actionBtn').textContent = state.i + 1 === state.queue.length ? T.finish : T.next;
   $('skipBtn').classList.add('hide');
 }
 
@@ -868,14 +868,14 @@ function next() {
 
 function reviewItem(a, withExplain) {
   const ok = isOk(a);
-  const lista = (ids) => ids.map((j) => markup(a.q.opts[j].t, false)).join(' · ');
+  const list = (ids) => ids.map((j) => markup(a.q.opts[j].t, false)).join(' · ');
   let h = '<div class="reviewitem' + (ok ? ' good' : '') + '">' +
-    '<div class="qtags"><span class="tag">' + escapeHtml(GROUP[a.q.g]) + '</span></div>' +
+    '<div class="qtags"><span class="tag">' + escapeHtml(GROUP[a.q.area]) + '</span></div>' +
     '<span class="rq">' + escapeHtml(a.q.q) + '</span>' + imgHtml(a.q) + codeHtml(a.q);
   if (!ok) {
-    h += '<span class="ra bad">' + T.tvojOdgovor + (a.picked.length ? lista(a.picked) : T.bezOdgovoraMalo) + '</span>';
+    h += '<span class="ra bad">' + T.yourAnswer + (a.picked.length ? list(a.picked) : T.noAnswerLower) + '</span>';
   }
-  h += '<span class="ra good">' + T.tacnoDvotacka + lista(a.q.ok) + '</span>';
+  h += '<span class="ra good">' + T.correctColon + list(a.q.ok) + '</span>';
   if (withExplain) h += explainHtml(a.q, a.picked, a.order, false);
   return h + '</div>';
 }
@@ -887,28 +887,28 @@ function finish() {
   if (state.mode === 'sim') {
     for (const a of answers) record(a.q.id, isOk(a));
     const pct = answers.length ? correct / answers.length : 0;
-    let prolazi, poruka;
-    if (PROLAZ) {
-      prolazi = correct >= PROLAZ;
-      poruka = (prolazi ? T.polozeno : T.nijePolozeno) + ' ' + T.zaProlaz(PROLAZ);
+    let pass, msg;
+    if (PASS_MARK) {
+      pass = correct >= PASS_MARK;
+      msg = (pass ? T.passed : T.failed) + ' ' + T.passNeeded(PASS_MARK);
     } else {
-      prolazi = pct >= 0.7;
-      poruka = T.poruke[pct >= 0.9 ? 0 : pct >= 0.7 ? 1 : pct >= 0.5 ? 2 : 3];
+      pass = pct >= 0.7;
+      msg = T.messages[pct >= 0.9 ? 0 : pct >= 0.7 ? 1 : pct >= 0.5 ? 2 : 3];
     }
-    h = '<div class="panel"><div class="grouplabel first">' + (PROLAZ ? T.simIspit : T.simUcenje) + '</div>' +
-      '<div class="score-big ' + (prolazi ? 'pass' : 'fail') + '">' + correct + ' / ' + answers.length + '</div>' +
-      '<p class="scoresub">' + poruka + '</p></div>' +
+    h = '<div class="panel"><div class="grouplabel first">' + (PASS_MARK ? T.simExam : T.simCheck) + '</div>' +
+      '<div class="score-big ' + (pass ? 'pass' : 'fail') + '">' + correct + ' / ' + answers.length + '</div>' +
+      '<p class="scoresub">' + msg + '</p></div>' +
       '<div class="reviewlist">' + answers.map((a) => reviewItem(a, true)).join('') + '</div>' +
-      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + T.pocetniEkran + '</button>' +
-      '<button class="btn" type="button" id="againBtn">' + (PROLAZ ? T.novaSim : T.novaProvera) + '</button></div>';
+      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + T.home + '</button>' +
+      '<button class="btn" type="button" id="againBtn">' + (PASS_MARK ? T.newSim : T.newCheck) + '</button></div>';
   } else {
     const wrong = answers.filter((a) => !isOk(a));
-    h = '<div class="panel"><div class="grouplabel first">' + modeLabel(state.mode) + ' · ' + T.krajKruga + '</div>' +
+    h = '<div class="panel"><div class="grouplabel first">' + modeLabel(state.mode) + ' · ' + T.endOfRound + '</div>' +
       '<div class="score-big ' + (wrong.length === 0 ? 'pass' : 'fail') + '">' + correct + ' / ' + answers.length + '</div>' +
-      '<p class="scoresub">' + (wrong.length ? T.zaPonavljanjeN + wrong.length + '. ' + T.preskocena : T.sveTacno) + '</p></div>' +
+      '<p class="scoresub">' + (wrong.length ? T.toRepeat + wrong.length + '. ' + T.skippedNote : T.allCorrect) + '</p></div>' +
       (wrong.length ? '<div class="reviewlist">' + wrong.map((a) => reviewItem(a, false)).join('') + '</div>' : '') +
-      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + T.pocetniEkran + '</button>' +
-      '<button class="btn" type="button" id="againBtn">' + T.ponovi + '</button></div>';
+      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + T.home + '</button>' +
+      '<button class="btn" type="button" id="againBtn">' + T.drill + '</button></div>';
   }
   $('results').innerHTML = h;
   showScreen('results');
@@ -918,7 +918,7 @@ function finish() {
   $('againBtn').addEventListener('click', () => start(sim ? 'sim' : 'drill', sim ? 'all' : area));
 }
 
-/* ---------- tema ---------- */
+/* ---------- theme ---------- */
 function applyTheme(t) {
   if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
 }
@@ -933,11 +933,11 @@ function toggleTheme() {
   store.set(st);
 }
 
-/* ---------- pokretanje ---------- */
+/* ---------- startup ---------- */
 function applyTexts() {
   for (const el of document.querySelectorAll('[data-t]')) {
     const k = el.dataset.t;
-    el.textContent = k === 'simMode' ? (PROLAZ ? T.simIspit : T.simUcenje) : T[k];
+    el.textContent = k === 'simMode' ? (PASS_MARK ? T.simExam : T.simCheck) : T[k];
   }
   for (const el of document.querySelectorAll('[data-t-attr]')) {
     el.title = T[el.dataset.tAttr];
@@ -988,11 +988,11 @@ applyTheme(store.get()._theme);
 refreshCounts();
 refreshStats();
 
-/* ---------- self-test (pregled.py opens the page with #selftest) ---------- */
+/* ---------- self-test (render_check.py opens the page with #selftest) ---------- */
 async function selfTest() {
-  let korak = 'counts';
-  const assert = (uslov, poruka) => { if (!uslov) throw new Error(poruka); };
-  const klikniPrvi = () => {
+  let step = 'counts';
+  const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
+  const clickFirst = () => {
     $('opts').querySelector('.opt').click();
     $('actionBtn').click();
   };
@@ -1000,34 +1000,34 @@ async function selfTest() {
     assert(BANK.length > 0, 'empty bank');
     assert($('cntAll').textContent.startsWith(BANK.length + ' '), 'cntAll shows ' + $('cntAll').textContent);
 
-    korak = 'learn';
+    step = 'learn';
     start('learn', 'all');
-    klikniPrvi();
+    clickFirst();
     assert(document.querySelector('#explainBox .explain'), 'no explanation after check');
 
-    korak = 'drill';
+    step = 'drill';
     goHome();
     start('drill', 'all');
     assert(document.querySelector('#quiz .qcard'), 'no question in drill mode');
 
-    korak = 'sim';
+    step = 'sim';
     goHome();
     start('sim', 'all');
-    for (let i = 0; i < 1000 && $('results').classList.contains('hide'); i++) klikniPrvi();
-    const ocekivano = CFG.sastav
-      ? Object.keys(CFG.sastav).reduce((s, g) => s + Math.min(CFG.sastav[g], BANK.filter((q) => q.g === g).length), 0)
-      : Math.min(CFG.broj, BANK.length);
-    const rez = document.querySelector('#results .score-big');
-    assert(rez, 'no result screen');
-    const m = rez.textContent.match(/^(\d+) \/ (\d+)$/);
-    assert(m && Number(m[2]) === ocekivano, 'score "' + rez.textContent + '", expected / ' + ocekivano);
+    for (let i = 0; i < 1000 && $('results').classList.contains('hide'); i++) clickFirst();
+    const expected = CFG.mix
+      ? Object.keys(CFG.mix).reduce((s, g) => s + Math.min(CFG.mix[g], BANK.filter((q) => q.area === g).length), 0)
+      : Math.min(CFG.count, BANK.length);
+    const res = document.querySelector('#results .score-big');
+    assert(res, 'no result screen');
+    const m = res.textContent.match(/^(\d+) \/ (\d+)$/);
+    assert(m && Number(m[2]) === expected, 'score "' + res.textContent + '", expected / ' + expected);
 
     let img = 0, code = 0;
-    const sSlikom = BANK.find((q) => q.img);
-    if (sSlikom) {
-      korak = 'picture';
+    const withImg = BANK.find((q) => q.img);
+    if (withImg) {
+      step = 'picture';
       start('learn', 'all');
-      state.queue = [sSlikom];
+      state.queue = [withImg];
       state.i = 0;
       renderQuestion();
       const el = document.querySelector('#quiz .qimg img');
@@ -1038,20 +1038,20 @@ async function selfTest() {
       assert(el.closest('.qimg').classList.contains('zoom'), 'tap does not zoom');
       img = 1;
     }
-    const sKodom = BANK.find((q) => q.code);
-    if (sKodom) {
-      korak = 'code';
+    const withCode = BANK.find((q) => q.code);
+    if (withCode) {
+      step = 'code';
       start('learn', 'all');
-      state.queue = [sKodom];
+      state.queue = [withCode];
       state.i = 0;
       renderQuestion();
       assert(document.querySelector('#quiz pre.code'), 'code block not rendered');
       code = 1;
     }
     goHome();
-    return 'SELFTEST OK modes=3 sim=' + ocekivano + ' img=' + img + ' code=' + code;
+    return 'SELFTEST OK modes=3 sim=' + expected + ' img=' + img + ' code=' + code;
   } catch (e) {
-    return 'SELFTEST FAIL ' + korak + ': ' + e.message;
+    return 'SELFTEST FAIL ' + step + ': ' + e.message;
   }
 }
 

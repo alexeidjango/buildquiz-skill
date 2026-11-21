@@ -1,0 +1,16 @@
+title = "Mini kviz"
+heading = "Mini"
+subtitle = "Probni kviz"
+intro = "Mali kviz za testove engine-a."
+storage_key = "mini-v1"
+output = "quiz_mini.html"
+citation = '\bP1\b'
+language = "sr-Latn"
+
+[areas]
+A = "Prva oblast"
+B = "Druga oblast"
+
+[simulation]
+pass_mark = 2
+count = 3
