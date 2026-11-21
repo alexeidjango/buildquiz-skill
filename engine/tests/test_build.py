@@ -168,6 +168,17 @@ def _names_html(src: str):
             yield n, m.group(1)
 
 
+# Serbian words that docs may show as examples: the skill's trigger words, and Serbian citation formats.
+ALLOWED_IN_DOCS = ('"kviz"',)
+
+
+def _names_md(src: str):
+    for n, line in enumerate(src.splitlines(), 1):
+        for phrase in ALLOWED_IN_DOCS:
+            line = line.replace(phrase, "")
+        yield n, line
+
+
 def test_no_old_names_in_repo():
     hits = []
     for p in sorted(SKILL.rglob("*")):
@@ -176,7 +187,8 @@ def test_no_old_names_in_repo():
         if p.name == "legacy.py":
             continue
         src = p.read_text(encoding="utf-8", errors="replace")
-        names = {".py": _names_py, ".toml": _names_toml, ".html": _names_html}.get(p.suffix)
+        names = {".py": _names_py, ".toml": _names_toml, ".html": _names_html, ".md": _names_md,
+                 ".example": _names_md}.get(p.suffix)
         if names is None:
             continue
         for n, name in names(src):
