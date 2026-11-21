@@ -5,7 +5,8 @@ intro = "Мали квиз за тестове."
 storage_key = "minicyr-v1"
 output = "quiz_mini_cyr.html"
 citation = 'стр\. \d+'
-language = "sr-Cyrl"
+language = "ru"
+content_language = "sr-Cyrl"
 cyrillic_only = true
 
 [areas]

@@ -437,7 +437,7 @@
       <div class="choicegrid" id="modePick">
         <button class="choice" type="button" data-shape="radio" data-val="learn" aria-pressed="true"><span class="mark"></span><span class="ctext"><span data-t="learn"></span> <span class="csub" data-t="learnDesc"></span></span></button>
         <button class="choice" type="button" data-shape="radio" data-val="drill" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="drill"></span> <span class="csub" data-t="drillDesc"></span></span></button>
-        <button class="choice" type="button" data-shape="radio" data-val="sim" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="simMode"></span> <span class="csub">__SIM_DESC__</span></span></button>
+        <button class="choice" type="button" data-shape="radio" data-val="sim" aria-pressed="false"><span class="mark"></span><span class="ctext"><span data-t="simMode"></span> <span class="csub" id="simDesc"></span></span></button>
       </div>
 
       <div class="grouplabel" data-t="area"></div>
@@ -491,6 +491,9 @@ __BANK__
 <script id="images" type="application/json">
 __IMAGES__
 </script>
+<script id="langs" type="application/json">
+__LANGS__
+</script>
 
 <script>
 if (location.hash === '#selftest-nostorage') {
@@ -499,65 +502,53 @@ if (location.hash === '#selftest-nostorage') {
 const BANK = JSON.parse(document.getElementById('bank').textContent);
 const IMG = JSON.parse(document.getElementById('images').textContent);
 const CFG = __CONFIG__;
-const T = {
-/*T.sr-Latn*/ 'sr-Latn': {
-  quit: 'Prekini', theme: 'Promeni temu', mode: 'Režim', area: 'Oblast', options: 'Opcije',
-  learn: 'Uči', learnDesc: 'sva pitanja iz oblasti, objašnjenje odmah posle svakog',
-  drill: 'Ponovi greške', drillDesc: 'samo pogrešena i neurađena pitanja',
-  simExam: 'Simulacija kolokvijuma', simShort: 'Simulacija', simCheck: 'Provera znanja',
-  shuffle: 'Mešaj redosled odgovora', start: 'Počni', progress: 'Tvoj napredak',
-  doneStat: 'urađeno', masteredStat: 'tačno', weakStat: 'za ponavljanje', reset: 'Obriši napredak',
-  resetNo: 'Ne, zadrži', resetYes: 'Da, obriši sve',
-  foot: 'Napredak se čuva samo na ovom uređaju. Na telefonu: Podeli → Dodaj na početni ekran.',
-  skip: 'Preskoči', check: 'Proveri', finish: 'Završi', next: 'Dalje',
-  questions: (n) => (n % 10 === 1 && n % 100 !== 11 ? 'pitanje' : 'pitanja'),
-  emptyTitle: 'Nema grešaka za ponavljanje',
-  emptyText: (exam) => 'Sva pitanja iz ove oblasti su poslednji put rešena tačno. Izaberi „Uči“ za ceo krug ili probaj ' +
-    (exam ? 'simulaciju kolokvijuma.' : 'proveru znanja.'),
-  back: 'Nazad na početak', imageAlt: 'slika uz pitanje', question: 'Pitanje', passMark: 'prolaz', correctSoFar: 'tačno',
-  multiHint: 'Više tačnih. Označi sve tačne.', singleHint: 'Jedan tačan odgovor.',
-  correct: 'Tačno', wrong: 'Netačno', wrongExam: 'Netačno, 0 poena', noAnswer: 'Bez odgovora',
-  whyNot: 'Zašto ne:', shouldBe: 'Trebalo je:', showAll: 'Prikaži objašnjenja za sve odgovore',
-  hideAll: 'Sakrij objašnjenja', vCorrect: 'tačno', vMissed: 'trebalo', vPicked: 'tvoj izbor',
-  yourAnswer: 'Tvoj odgovor: ', noAnswerLower: 'bez odgovora', correctColon: 'Tačno: ',
-  passed: 'Položeno.', failed: 'Nije položeno.', passNeeded: (n) => 'Za prolaz treba ' + n + ' tačnih.',
-  newSim: 'Nova simulacija', newCheck: 'Nova provera', home: 'Početni ekran',
-  endOfRound: 'kraj kruga', toRepeat: 'Za ponavljanje: ',
-  skippedNote: 'Preskočena pitanja se ne računaju kao urađena.', allCorrect: 'Sve tačno.',
-  messages: ['Odlično!', 'Vrlo dobro.', 'Dobro. Ponovi greške.', 'Ponovi gradivo, pa probaj ponovo.'],
-  letters: 'abcdefgh',
-}, /*T.sr-Latn end*/
-/*T.sr-Cyrl*/ 'sr-Cyrl': {
-  quit: 'Прекини', theme: 'Промени тему', mode: 'Режим', area: 'Област', options: 'Опције',
-  learn: 'Учи', learnDesc: 'сва питања из области, објашњење одмах после сваког',
-  drill: 'Понови грешке', drillDesc: 'само погрешена и неурађена питања',
-  simExam: 'Симулација колоквијума', simShort: 'Симулација', simCheck: 'Провера знања',
-  shuffle: 'Мешај редослед одговора', start: 'Почни', progress: 'Твој напредак',
-  doneStat: 'урађено', masteredStat: 'тачно', weakStat: 'за понављање', reset: 'Обриши напредак',
-  resetNo: 'Не, задржи', resetYes: 'Да, обриши све',
-  foot: 'Напредак се чува само на овом уређају. На телефону: Подели → Додај на почетни екран.',
-  skip: 'Прескочи', check: 'Провери', finish: 'Заврши', next: 'Даље',
-  questions: (n) => (n % 10 === 1 && n % 100 !== 11 ? 'питање' : 'питања'),
-  emptyTitle: 'Нема грешака за понављање',
-  emptyText: (exam) => 'Сва питања из ове области су последњи пут решена тачно. Изабери „Учи“ за цео круг или пробај ' +
-    (exam ? 'симулацију колоквијума.' : 'проверу знања.'),
-  back: 'Назад на почетак', imageAlt: 'слика уз питање', question: 'Питање', passMark: 'пролаз', correctSoFar: 'тачно',
-  multiHint: 'Више тачних. Означи све тачне.', singleHint: 'Један тачан одговор.',
-  correct: 'Тачно', wrong: 'Нетачно', wrongExam: 'Нетачно, 0 поена', noAnswer: 'Без одговора',
-  whyNot: 'Зашто не:', shouldBe: 'Требало је:', showAll: 'Прикажи објашњења за све одговоре',
-  hideAll: 'Сакриј објашњења', vCorrect: 'тачно', vMissed: 'требало', vPicked: 'твој избор',
-  yourAnswer: 'Твој одговор: ', noAnswerLower: 'без одговора', correctColon: 'Тачно: ',
-  passed: 'Положено.', failed: 'Није положено.', passNeeded: (n) => 'За пролаз треба ' + n + ' тачних.',
-  newSim: 'Нова симулација', newCheck: 'Нова провера', home: 'Почетни екран',
-  endOfRound: 'крај круга', toRepeat: 'За понављање: ',
-  skippedNote: 'Прескочена питања се не рачунају као урађена.', allCorrect: 'Све тачно.',
-  messages: ['Одлично!', 'Врло добро.', 'Добро. Понови грешке.', 'Понови градиво, па пробај поново.'],
-  letters: 'абвгдђеж',
-}, /*T.sr-Cyrl end*/
-}[CFG.language];
-const GROUP = CFG.areas;
-const LETTERS = T.letters;
 const PASS_MARK = CFG.passMark;
+const LANGS = JSON.parse(document.getElementById('langs').textContent);
+let LANG = CFG.language;
+let T = {};
+let LETTERS = '';
+let PLURAL = null;
+
+/* A screen text of the current language; plural objects pick the form for vars.n, {name} takes vars[name]. */
+function tr(key, vars) {
+  vars = vars || {};
+  let v = T[key];
+  if (v && typeof v === 'object' && !Array.isArray(v)) v = v[PLURAL.select(vars.n)] || v.other;
+  if (typeof v !== 'string') return v;
+  return v.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+}
+
+/* Screen text inside HTML built from strings: marked with the screen language (the page root has the
+   language of the questions). */
+function L(text) {
+  return '<span lang="' + LANG + '">' + text + '</span>';
+}
+
+function simDesc() {
+  const parts = [];
+  if (CFG.mix) {
+    const n = Object.values(CFG.mix).reduce((x, y) => x + y, 0);
+    const mix = Object.keys(CFG.areas).filter((g) => g in CFG.mix)
+      .map((g) => CFG.mix[g] + ' ' + CFG.areas[g].toLocaleLowerCase(CFG.contentLanguage)).join(' + ');
+    parts.push(tr('simMix', { n, parts: mix }));
+  } else {
+    parts.push(tr('simRandom', { n: CFG.count }));
+  }
+  if (PASS_MARK) parts.push(tr('simPassMark', { n: PASS_MARK }));
+  parts.push(tr('simScore'));
+  return parts.join(', ');
+}
+
+function setLanguage(code) {
+  if (!LANGS[code]) code = CFG.language;
+  LANG = code;
+  T = LANGS[code].strings;
+  LETTERS = LANGS[code].letters;
+  PLURAL = new Intl.PluralRules(code);
+  applyTexts();
+  refreshCounts();
+}
+const GROUP = CFG.areas;
 const $ = (id) => document.getElementById(id);
 
 function escapeHtml(s) {
@@ -679,7 +670,7 @@ function refreshStats() {
 function refreshCounts() {
   const n = (g) => BANK.filter((q) => g === 'all' || q.area === g).length;
   for (const g of ['all', ...Object.keys(CFG.areas)]) {
-    $('cnt' + (g === 'all' ? 'All' : g)).textContent = n(g) + ' ' + T.questions(n(g));
+    $('cnt' + (g === 'all' ? 'All' : g)).textContent = tr('questions', { n: n(g) });
   }
 }
 
@@ -724,9 +715,9 @@ function renderEmpty() {
   showScreen('quiz');
   $('bar').classList.add('hide');
   $('quiz').innerHTML =
-    '<div class="panel empty"><p class="big">' + T.emptyTitle + '</p>' +
-    '<p class="lede" style="margin:0 auto 16px">' + T.emptyText(!!PASS_MARK) + '</p>' +
-    '<button class="btn" type="button" id="emptyBack">' + T.back + '</button></div>';
+    '<div class="panel empty"><p class="big">' + L(T.emptyTitle) + '</p>' +
+    '<p class="lede" style="margin:0 auto 16px">' + L(tr(PASS_MARK ? 'emptyTextExam' : 'emptyTextLearn')) + '</p>' +
+    '<button class="btn" type="button" id="emptyBack">' + L(T.back) + '</button></div>';
   $('progWrap').hidden = true;
   $('metaRow').hidden = true;
   $('emptyBack').addEventListener('click', goHome);
@@ -762,9 +753,9 @@ function renderQuestion() {
   $('quiz').innerHTML =
     '<article class="qcard">' +
     '<div class="qtags"><span class="tag">' + escapeHtml(GROUP[q.area]) + '</span>' +
-    (q.off_source && state.mode !== 'sim' ? '<span class="tag off">' + escapeHtml(CFG.offSourceLabel) + '</span>' : '') + '</div>' +
+    (q.off_source && state.mode !== 'sim' ? '<span class="tag off">' + (CFG.offSourceLabel ? escapeHtml(CFG.offSourceLabel) : L(T.offSource)) + '</span>' : '') + '</div>' +
     '<p class="qtext">' + escapeHtml(q.q) + '</p>' + imgHtml(q) + codeHtml(q) +
-    '<p class="qhint">' + (q.multi ? T.multiHint : T.singleHint) + '</p>' +
+    '<p class="qhint">' + L(q.multi ? T.multiHint : T.singleHint) + '</p>' +
     '<div class="opts" id="opts">' + opts + '</div>' +
     '<div id="explainBox"></div>' +
     '</article>';
@@ -799,14 +790,14 @@ function explainHtml(q, picked, order, bold) {
   const wrong = picked.filter((j) => !q.ok.includes(j));
   const missed = q.ok.filter((j) => !picked.includes(j));
   let h = '<div class="explain ' + (ok ? 'ok' : 'no') + '">';
-  h += '<div class="head">' + (ok ? T.correct : picked.length ? (PASS_MARK ? T.wrongExam : T.wrong) : T.noAnswer) + '</div>';
-  for (const j of wrong) h += '<p><span class="why-not">' + T.whyNot + '</span> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
-  if (!ok) for (const j of missed) h += '<p><b>' + T.shouldBe + '</b> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
+  h += '<div class="head">' + L(ok ? T.correct : picked.length ? (PASS_MARK ? T.wrongExam : T.wrong) : T.noAnswer) + '</div>';
+  for (const j of wrong) h += '<p><span class="why-not">' + L(T.whyNot) + '</span> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
+  if (!ok) for (const j of missed) h += '<p><b>' + L(T.shouldBe) + '</b> ' + markup(q.opts[j].t, bold) + '. ' + escapeHtml(q.opts[j].why) + '</p>';
   if (ok) for (const j of q.ok) h += '<p>' + escapeHtml(q.opts[j].why) + '</p>';
   if (q.note) h += '<p class="note">' + escapeHtml(q.note) + '</p>';
   const others = order.map((j, pos) =>
     '<div' + (q.ok.includes(j) ? ' class="is-ok"' : '') + '><b>' + LETTERS[pos] + ')</b> ' + escapeHtml(q.opts[j].why) + '</div>').join('');
-  h += '<p><button class="linkbtn" type="button" data-toggle="other">' + T.showAll + '</button></p>' +
+  h += '<p><button class="linkbtn" type="button" lang="' + LANG + '" data-toggle="other">' + T.showAll + '</button></p>' +
     '<div class="other hide">' + others + '</div></div>';
   return h;
 }
@@ -830,10 +821,10 @@ function reveal() {
     b.setAttribute('aria-pressed', 'false');
     if (q.ok.includes(j)) {
       b.classList.add(isPicked ? 'correct' : 'missed');
-      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + (isPicked ? T.vCorrect : T.vMissed) + '</span>');
+      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + L(isPicked ? T.vCorrect : T.vMissed) + '</span>');
     } else if (isPicked) {
       b.classList.add('wrong');
-      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + T.vPicked + '</span>');
+      b.insertAdjacentHTML('beforeend', '<span class="verdict">' + L(T.vPicked) + '</span>');
     }
   }
   $('explainBox').innerHTML = explainHtml(q, [...state.picked], state.order, true);
@@ -873,9 +864,9 @@ function reviewItem(a, withExplain) {
     '<div class="qtags"><span class="tag">' + escapeHtml(GROUP[a.q.area]) + '</span></div>' +
     '<span class="rq">' + escapeHtml(a.q.q) + '</span>' + imgHtml(a.q) + codeHtml(a.q);
   if (!ok) {
-    h += '<span class="ra bad">' + T.yourAnswer + (a.picked.length ? list(a.picked) : T.noAnswerLower) + '</span>';
+    h += '<span class="ra bad">' + L(T.yourAnswer) + (a.picked.length ? list(a.picked) : L(T.noAnswerLower)) + '</span>';
   }
-  h += '<span class="ra good">' + T.correctColon + list(a.q.ok) + '</span>';
+  h += '<span class="ra good">' + L(T.correctColon) + list(a.q.ok) + '</span>';
   if (withExplain) h += explainHtml(a.q, a.picked, a.order, false);
   return h + '</div>';
 }
@@ -890,25 +881,25 @@ function finish() {
     let pass, msg;
     if (PASS_MARK) {
       pass = correct >= PASS_MARK;
-      msg = (pass ? T.passed : T.failed) + ' ' + T.passNeeded(PASS_MARK);
+      msg = (pass ? T.passed : T.failed) + ' ' + tr('passNeeded', { n: PASS_MARK });
     } else {
       pass = pct >= 0.7;
       msg = T.messages[pct >= 0.9 ? 0 : pct >= 0.7 ? 1 : pct >= 0.5 ? 2 : 3];
     }
-    h = '<div class="panel"><div class="grouplabel first">' + (PASS_MARK ? T.simExam : T.simCheck) + '</div>' +
+    h = '<div class="panel"><div class="grouplabel first">' + L(PASS_MARK ? T.simExam : T.simCheck) + '</div>' +
       '<div class="score-big ' + (pass ? 'pass' : 'fail') + '">' + correct + ' / ' + answers.length + '</div>' +
-      '<p class="scoresub">' + msg + '</p></div>' +
+      '<p class="scoresub">' + L(msg) + '</p></div>' +
       '<div class="reviewlist">' + answers.map((a) => reviewItem(a, true)).join('') + '</div>' +
-      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + T.home + '</button>' +
-      '<button class="btn" type="button" id="againBtn">' + (PASS_MARK ? T.newSim : T.newCheck) + '</button></div>';
+      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + L(T.home) + '</button>' +
+      '<button class="btn" type="button" id="againBtn">' + L(PASS_MARK ? T.newSim : T.newCheck) + '</button></div>';
   } else {
     const wrong = answers.filter((a) => !isOk(a));
-    h = '<div class="panel"><div class="grouplabel first">' + modeLabel(state.mode) + ' · ' + T.endOfRound + '</div>' +
+    h = '<div class="panel"><div class="grouplabel first">' + L(modeLabel(state.mode) + ' · ' + T.endOfRound) + '</div>' +
       '<div class="score-big ' + (wrong.length === 0 ? 'pass' : 'fail') + '">' + correct + ' / ' + answers.length + '</div>' +
-      '<p class="scoresub">' + (wrong.length ? T.toRepeat + wrong.length + '. ' + T.skippedNote : T.allCorrect) + '</p></div>' +
+      '<p class="scoresub">' + L(wrong.length ? tr('toRepeat', { n: wrong.length }) + ' ' + T.skippedNote : T.allCorrect) + '</p></div>' +
       (wrong.length ? '<div class="reviewlist">' + wrong.map((a) => reviewItem(a, false)).join('') + '</div>' : '') +
-      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + T.home + '</button>' +
-      '<button class="btn" type="button" id="againBtn">' + T.drill + '</button></div>';
+      '<div class="btnrow"><button class="btn ghost" type="button" id="homeBtn">' + L(T.home) + '</button>' +
+      '<button class="btn" type="button" id="againBtn">' + L(T.drill) + '</button></div>';
   }
   $('results').innerHTML = h;
   showScreen('results');
@@ -943,6 +934,8 @@ function applyTexts() {
     el.title = T[el.dataset.tAttr];
     el.setAttribute('aria-label', T[el.dataset.tAttr]);
   }
+  $('simDesc').textContent = simDesc();
+  for (const el of document.querySelectorAll('[data-t], [data-t-attr], .csub, #metaRow, #bar')) el.lang = LANG;
 }
 
 wireRadio('modePick', syncAreaForMode);
@@ -983,9 +976,8 @@ document.addEventListener('click', (ev) => {
   if (f) f.classList.toggle('zoom');
 });
 
-applyTexts();
+setLanguage(CFG.language);
 applyTheme(store.get()._theme);
-refreshCounts();
 refreshStats();
 
 /* ---------- self-test (render_check.py opens the page with #selftest) ---------- */

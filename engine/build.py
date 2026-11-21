@@ -14,44 +14,14 @@ ENGINE = Path(__file__).resolve().parent
 if str(ENGINE) not in sys.path:
     sys.path.insert(0, str(ENGINE))
 
-from load import QuizError, load_quiz  # noqa: E402
+from load import LANG_DIR, QuizError, available_languages, load_quiz  # noqa: E402
 
 TEMPLATE = ENGINE / "template.html"
-PLACEHOLDERS = ("TITLE", "HEADING", "SUBTITLE", "INTRO", "SIM_DESC", "AREAS", "CONFIG", "BANK", "IMAGES", "LANG")
+PLACEHOLDERS = ("TITLE", "HEADING", "SUBTITLE", "INTRO", "AREAS", "CONFIG", "BANK", "IMAGES", "LANGS", "LANG")
 
-# Words Python writes into the HTML; every other screen text is in the T table inside template.html.
-UI = {
-    "sr-Latn": {"all": "Sve", "random": ("nasumično", "nasumična", "nasumičnih"),
-                "questions": ("pitanje", "pitanja", "pitanja"), "pass_mark": "prolaz", "score": "rezultat na kraju"},
-    "sr-Cyrl": {"all": "Све", "random": ("насумично", "насумична", "насумичних"),
-                "questions": ("питање", "питања", "питања"), "pass_mark": "пролаз", "score": "резултат на крају"},
-}
-
-
-def _form(n: int, forms: tuple[str, str, str]) -> str:
-    """Serbian plural: 1, 21 -> first; 2-4, 22-24 -> second; else third."""
-    if n % 10 == 1 and n % 100 != 11:
-        return forms[0]
-    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
-        return forms[1]
-    return forms[2]
-
-
-def sim_desc(cfg: dict) -> str:
-    """The subtitle of the third mode, e.g. "30 nasumičnih pitanja, prolaz 15, rezultat na kraju"."""
-    ui = UI[cfg["language"]]
-    sim = cfg["simulation"]
-    if sim.get("mix"):
-        mix = sim["mix"]
-        n = sum(mix.values())
-        parts = " + ".join(f"{mix[g]} {cfg['areas'][g].lower()}" for g in cfg["areas"] if g in mix)
-        desc = f"{n} {_form(n, ui['questions'])}: {parts}"
-    else:
-        n = sim["count"]
-        desc = f"{n} {_form(n, ui['random'])} {_form(n, ui['questions'])}"
-    if sim.get("pass_mark"):
-        desc += f", {ui['pass_mark']} {sim['pass_mark']}"
-    return f"{desc}, {ui['score']}"
+def load_languages() -> dict[str, dict]:
+    """Every screen language file, code -> {name, letters, strings}; all of them go into each page."""
+    return {code: json.loads((LANG_DIR / f"{code}.json").read_text(encoding="utf-8")) for code in available_languages()}
 
 
 def _json_in_script(obj, **kw) -> str:
@@ -64,7 +34,7 @@ def _areas_html(cfg: dict) -> str:
     e = html.escape
     rows = ['        <button class="choice" style="grid-column:1/-1" type="button" data-shape="radio" data-val="all" '
             'aria-pressed="true"><span class="mark"></span><span class="ctext">'
-            f'{UI[cfg["language"]]["all"]} <span class="csub" id="cntAll"></span></span></button>']
+            '<span data-t="all"></span> <span class="csub" id="cntAll"></span></span></button>']
     for g, label in cfg["areas"].items():
         rows.append(f'        <button class="choice" type="button" data-shape="radio" data-val="{g}" '
                     'aria-pressed="false"><span class="mark"></span><span class="ctext">'
@@ -92,18 +62,18 @@ def build_html(cfg: dict, bank: list[dict], folder: Path) -> str:
     sim = cfg["simulation"]
     config = {"areas": cfg["areas"], "passMark": sim.get("pass_mark"), "count": sim.get("count"),
               "mix": sim.get("mix"), "storageKey": cfg["storage_key"], "offSourceLabel": cfg["off_source_label"],
-              "language": cfg["language"]}
+              "language": cfg["language"], "contentLanguage": cfg["content_language"]}
     values = {
         "TITLE": html.escape(cfg["title"]),
         "HEADING": html.escape(cfg["heading"]),
         "SUBTITLE": html.escape(cfg["subtitle"]),
         "INTRO": html.escape(cfg["intro"]),
-        "SIM_DESC": html.escape(sim_desc(cfg)),
         "AREAS": _areas_html(cfg),
         "CONFIG": _json_in_script(config),
         "BANK": _json_in_script(bank, indent=0),
         "IMAGES": _json_in_script(_images(bank, Path(folder))),
-        "LANG": cfg["language"],
+        "LANGS": _json_in_script(load_languages()),
+        "LANG": html.escape(cfg["content_language"]),
     }
     # One pass, so placeholder-like text inside the inserted values is never replaced again.
     return re.sub(r"__(" + "|".join(PLACEHOLDERS) + r")__", lambda m: values[m.group(1)], template)

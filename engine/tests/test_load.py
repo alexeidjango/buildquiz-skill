@@ -13,15 +13,16 @@ def test_loads_fixture():
     assert quiz.term_area == {"crvena": "A", "glavni grad": "B"}
     assert quiz.terms == {"crvena": "crven", "glavni grad": "Beograd"}
     assert list(quiz.cfg["areas"]) == ["A", "B"]
-    assert quiz.cfg["off_source_label"] == "van slajdova"
-    assert quiz.cfg["language"] == "sr-Latn" and quiz.cfg["cyrillic_only"] is False
+    assert quiz.cfg["off_source_label"] is None
+    assert quiz.cfg["language"] == "sr-Latn" and quiz.cfg["content_language"] == "sr-Latn"
+    assert quiz.cfg["cyrillic_only"] is False
     assert quiz.load_errors == []
 
 
 def test_cyr_defaults():
     cfg = load_quiz(MINI_CYR).cfg
-    assert cfg["language"] == "sr-Cyrl" and cfg["cyrillic_only"] is True
-    assert cfg["off_source_label"] == "ван слајдова"
+    assert cfg["language"] == "ru" and cfg["content_language"] == "sr-Cyrl" and cfg["cyrillic_only"] is True
+    assert cfg["off_source_label"] is None
     assert cfg["simulation"].get("pass_mark") is None
 
 
@@ -118,3 +119,28 @@ def test_area_filter_is_case_insensitive_and_validated():
     for bad in ("Z", "", "AZ"):
         with pytest.raises(QuizError, match="area"):
             load_quiz(MINI, areas=bad)
+
+
+@pytest.mark.parametrize("edit, field", [('language = "xx"', "language"), ('content_language = "Serbian!"', "content_language")])
+def test_language_config_errors(tmp_path, edit, field):
+    q = copy_quiz(MINI, tmp_path / "q")
+    if field == "language":
+        text = BASE.replace('language = "sr-Latn"', edit)
+    else:
+        text = BASE.replace('language = "sr-Latn"', 'language = "sr-Latn"\n' + edit)
+    (q / "quiz.toml").write_text(text, encoding="utf-8")
+    with pytest.raises(QuizError) as e:
+        load_quiz(q)
+    assert str(e.value).startswith(field)
+    if field == "language":
+        assert "en, ru, sr-Cyrl, sr-Latn" in str(e.value)
+
+
+def test_language_defaults_to_english(tmp_path):
+    q = copy_quiz(MINI, tmp_path / "q")
+    (q / "quiz.toml").write_text(BASE.replace('language = "sr-Latn"\n', ""), encoding="utf-8")
+    cfg = load_quiz(q).cfg
+    assert cfg["language"] == "en" and cfg["content_language"] == "en"
+    (q / "quiz.toml").write_text(BASE.replace('language = "sr-Latn"', 'language = "ru"'), encoding="utf-8")
+    cfg = load_quiz(q).cfg
+    assert cfg["language"] == "ru" and cfg["content_language"] == "ru"

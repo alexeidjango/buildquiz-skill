@@ -9,7 +9,7 @@ import tokenize
 import pytest
 
 from conftest import ENGINE, MINI, MINI_CYR, SKILL, copy_quiz
-from build import build_html, sim_desc
+from build import build_html
 from load import load_quiz
 
 BUILD = ENGINE / "build.py"
@@ -44,7 +44,7 @@ def test_cfg_json_roundtrip():
     out, _ = build()
     cfg = json.loads(re.search(r"const CFG = (.*?);\n", out).group(1))
     assert cfg["passMark"] == 2 and cfg["count"] == 3 and cfg["mix"] is None
-    assert cfg["offSourceLabel"] == "van slajdova" and cfg["language"] == "sr-Latn"
+    assert cfg["offSourceLabel"] is None and cfg["language"] == "sr-Latn" and cfg["contentLanguage"] == "sr-Latn"
     assert cfg["storageKey"] == "mini-v1"
     assert cfg["areas"] == {"A": "Prva oblast", "B": "Druga oblast"}
 
@@ -69,25 +69,6 @@ def test_hostile_text_is_escaped(tmp_path):
     assert out.count("</script>") == TEMPLATE.count("</script>")
     assert "</script><b>" not in out
     assert "a &lt; b &amp; c" in out
-
-
-def test_sim_desc_count():
-    cfg = {"language": "sr-Latn", "areas": {"A": "X", "B": "Y"}, "simulation": {"count": 30, "pass_mark": 15}}
-    assert sim_desc(cfg) == "30 nasumičnih pitanja, prolaz 15, rezultat na kraju"
-
-
-def test_sim_desc_mix():
-    cfg = {"language": "sr-Latn", "areas": {"A": "Prva oblast", "B": "Druga oblast"},
-           "simulation": {"mix": {"B": 1, "A": 2}, "pass_mark": 2}}
-    assert sim_desc(cfg) == "3 pitanja: 2 prva oblast + 1 druga oblast, prolaz 2, rezultat na kraju"
-
-
-def test_sim_desc_learning():
-    assert sim_desc(load_quiz(MINI_CYR).cfg) == "3 насумична питања, резултат на крају"
-    cfg = {"language": "sr-Cyrl", "areas": {"A": "X", "B": "Y"}, "simulation": {"count": 21}}
-    assert sim_desc(cfg) == "21 насумично питање, резултат на крају"
-    cfg = {"language": "sr-Latn", "areas": {"A": "X", "B": "Y"}, "simulation": {"count": 12}}
-    assert sim_desc(cfg) == "12 nasumičnih pitanja, rezultat na kraju"
 
 
 def test_cli_writes_out(tmp_path):
@@ -128,16 +109,33 @@ class _Text(html.parser.HTMLParser):
             self.parts.append(data)
 
 
-def test_cyrillic_ui_has_no_latin():
+def test_cyrillic_page_text_has_no_latin():
     out, _ = build(MINI_CYR)
     p = _Text()
     p.feed(out)
-    text = " ".join(p.parts)
-    cyr = re.search(r"/\*T\.sr-Cyrl\*/ 'sr-Cyrl': \{(.*?)/\*T\.sr-Cyrl end\*/", out, re.S).group(1)
-    strings = " ".join(re.findall(r"'((?:[^'\\]|\\.)*)'", cyr))
-    lat = re.findall(r"[A-Za-zČčĆćŠšĐđŽž]{3,}", text + " " + strings)
+    lat = re.findall(r"[A-Za-zČčĆćŠšĐđŽž]{3,}", " ".join(p.parts))
     assert lat == [], lat
-    assert 'lang="sr-Cyrl"' in out
+
+
+def test_all_languages_inlined():
+    out, _ = build()
+    langs = script(out, "langs")
+    assert {"en", "sr-Latn", "sr-Cyrl", "ru"} <= set(langs)
+    assert langs["ru"]["strings"]["start"] and langs["en"]["letters"].startswith("abc")
+
+
+def test_root_lang_is_content_language():
+    out, _ = build(MINI_CYR)
+    assert '<div lang="sr-Cyrl">' in out
+    cfg = json.loads(re.search(r"const CFG = (.*?);\n", out).group(1))
+    assert cfg["language"] == "ru" and cfg["contentLanguage"] == "sr-Cyrl"
+
+
+def test_off_source_label_override():
+    quiz = load_quiz(MINI)
+    quiz.cfg["off_source_label"] = "van ovih strana"
+    out = build_html(quiz.cfg, quiz.bank, quiz.folder)
+    assert json.loads(re.search(r"const CFG = (.*?);\n", out).group(1))["offSourceLabel"] == "van ovih strana"
 
 
 # Old Serbian names that must not come back (tests/legacy.py, which reads the author's old quizzes, is exempt).

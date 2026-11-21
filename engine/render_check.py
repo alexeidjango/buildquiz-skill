@@ -30,16 +30,25 @@ def _browser() -> Path:
     raise RuntimeError("no Edge or Chrome found at: " + ", ".join(map(str, BROWSERS)))
 
 
+def _run(html_path: Path, fragment: str) -> subprocess.CompletedProcess:
+    uri = Path(html_path).resolve().as_uri() + fragment
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as profile:
+        return subprocess.run(
+            [str(_browser()), "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
+             f"--user-data-dir={profile}", *NO_NETWORK, "--virtual-time-budget=5000", "--dump-dom", uri],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
+
+
+def dump_dom(html_path: Path, fragment: str = "") -> str:
+    """The page's DOM after its scripts ran, opened with an optional #fragment."""
+    return _run(html_path, fragment).stdout
+
+
 def render(html_path: Path, nostorage: bool = False) -> str:
     """The self-test result line, e.g. "SELFTEST OK modes=3 sim=30 img=0 code=0" or "SELFTEST FAIL <step>: ...".
 
     Raises RuntimeError (with the browser's stderr) when the page produced no result line."""
-    uri = Path(html_path).resolve().as_uri() + ("#selftest-nostorage" if nostorage else "#selftest")
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as profile:
-        r = subprocess.run(
-            [str(_browser()), "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
-             f"--user-data-dir={profile}", *NO_NETWORK, "--virtual-time-budget=5000", "--dump-dom", uri],
-            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
+    r = _run(html_path, "#selftest-nostorage" if nostorage else "#selftest")
     m = re.search(r'<pre id="selftest">(.*?)</pre>', r.stdout, re.S)
     if not m:
         raise RuntimeError(f"no self-test result in the page (exit {r.returncode}): {r.stderr[-2000:]}")

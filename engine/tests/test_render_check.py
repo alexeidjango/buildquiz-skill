@@ -1,3 +1,4 @@
+import re
 import tomllib
 
 import pytest
@@ -6,7 +7,7 @@ from conftest import MINI, MINI_CYR, REPO, build_quiz, copy_quiz
 from build import build_html
 from legacy import VEROVATNOCA_PAGE, is_legacy_quiz, legacy_bank, legacy_html_bank, legacy_images
 from load import load_quiz, validate_config
-from render_check import render
+from render_check import dump_dom, render
 
 
 def toml(areas: dict, sim: str, rest: str = 'language = "sr-Latn"') -> str:
@@ -133,3 +134,25 @@ def test_comment_script_text_still_plays(tmp_path):
     out = tmp_path / "k.html"
     out.write_text(build_html(quiz.cfg, quiz.bank, quiz.folder), encoding="utf-8")
     assert render(out).startswith("SELFTEST OK")
+
+
+@pytest.mark.parametrize("lang, n, text", [
+    ("ru", 21, "21 случайный вопрос"), ("ru", 22, "22 случайных вопроса"), ("ru", 25, "25 случайных вопросов"),
+    ("sr-Latn", 21, "21 nasumično pitanje"), ("sr-Latn", 22, "22 nasumična pitanja"),
+    ("sr-Latn", 11, "11 nasumičnih pitanja"), ("en", 1, "1 random question"), ("en", 2, "2 random questions")])
+def test_plural_forms_in_subtitle(tmp_path, lang, n, text):
+    q = copy_quiz(MINI, tmp_path / "q")
+    s = (q / "quiz.toml").read_text(encoding="utf-8")
+    s = s.replace('language = "sr-Latn"', f'language = "{lang}"').replace("count = 3", f"count = {n}")
+    (q / "quiz.toml").write_text(s.replace("pass_mark = 2\n", ""), encoding="utf-8")
+    dom = dump_dom(build_quiz(tmp_path, q))
+    m = re.search(r'id="simDesc"[^>]*>([^<]*)<', dom)
+    assert m and m.group(1).startswith(text + ","), m and m.group(1)
+
+
+@pytest.mark.parametrize("lang", ["en", "sr-Latn", "sr-Cyrl", "ru"])
+def test_selftest_each_default_language(tmp_path, lang):
+    q = copy_quiz(MINI, tmp_path / "q")
+    s = (q / "quiz.toml").read_text(encoding="utf-8").replace('language = "sr-Latn"', f'language = "{lang}"')
+    (q / "quiz.toml").write_text(s, encoding="utf-8")
+    assert render(build_quiz(tmp_path, q)).startswith("SELFTEST OK modes=3 sim=3")

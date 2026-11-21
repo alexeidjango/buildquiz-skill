@@ -10,11 +10,15 @@ from pathlib import Path
 from bank_api import normalize
 
 ENGINE = Path(__file__).resolve().parent
+LANG_DIR = ENGINE / "lang"
 REQUIRED = ("title", "heading", "subtitle", "intro", "storage_key", "output", "citation")
-# Screen languages the template has (widened to every engine/lang/*.json file in Task 2) and their default tag
-# for off_source questions.
-OFF_SOURCE_LABEL = {"sr-Latn": "van slajdova", "sr-Cyrl": "ван слајдова"}
+LANGUAGE_TAG = re.compile(r"^[a-z]{2,3}(-[A-Za-z0-9]+)*$")
 QUIZ_MODULES = ("bank", "terms", "items")
+
+
+def available_languages() -> list[str]:
+    """Screen language codes: one engine/lang/<code>.json file each, sorted."""
+    return sorted(p.stem for p in LANG_DIR.glob("*.json"))
 
 
 class QuizError(Exception):
@@ -47,15 +51,19 @@ def validate_config(cfg: dict) -> dict:
         re.compile(cfg["citation"])
     except re.error as e:
         raise QuizError(f"citation: invalid regex: {e}") from None
-    language = cfg.get("language")
-    if language not in OFF_SOURCE_LABEL:
-        raise QuizError(f"language: must be one of {', '.join(sorted(OFF_SOURCE_LABEL))}")
+    language = cfg.setdefault("language", "en")
+    if language not in available_languages():
+        raise QuizError(f"language: {language!r} has no file in engine/lang/; available: "
+                        f"{', '.join(available_languages())}")
+    content = cfg.setdefault("content_language", language)
+    if not isinstance(content, str) or not LANGUAGE_TAG.match(content):
+        raise QuizError(f"content_language: {content!r} is not a language tag such as \"sr-Cyrl\" or \"en\"")
     if not isinstance(cfg.setdefault("cyrillic_only", False), bool):
         raise QuizError("cyrillic_only: must be true or false")
     for field in ("off_source_label", "artifact"):
         if field in cfg and not isinstance(cfg[field], str):
             raise QuizError(f"{field}: must be a string")
-    cfg.setdefault("off_source_label", OFF_SOURCE_LABEL[language])
+    cfg.setdefault("off_source_label", None)  # None: the tag comes from the screen language and switches with it
     cfg.setdefault("artifact", "")
     allowed = cfg.setdefault("latin_allowed", [])
     if not isinstance(allowed, list) or not all(isinstance(x, str) for x in allowed):
