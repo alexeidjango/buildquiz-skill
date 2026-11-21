@@ -133,6 +133,17 @@
     font: inherit; font-size: .85rem; font-weight: 600;
     cursor: pointer;
   }
+  .langpick {
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 8px;
+    height: 32px;
+    max-width: 108px;
+    padding: 0 6px;
+    font: inherit; font-size: .85rem; font-weight: 600;
+    cursor: pointer;
+  }
   .themebtn {
     border: 1px solid var(--border-strong);
     background: var(--surface);
@@ -422,6 +433,7 @@
       <h1>__HEADING__ · <span>__SUBTITLE__</span></h1>
       <div class="headbtns">
         <button class="quitbtn" id="quitBtn" type="button" hidden data-t="quit"></button>
+        <select class="langpick" id="langPick" data-t-attr="language"></select>
         <button class="themebtn" id="themeBtn" type="button" data-t-attr="theme">◐</button>
       </div>
     </div>
@@ -539,12 +551,37 @@ function simDesc() {
   return parts.join(', ');
 }
 
+const LANG_ORDER = ['en', 'sr-Latn', 'sr-Cyrl', 'ru'];
+const LANG_KEY = CFG.storageKey + '-lang';
+
+/* The switcher's order: the four built-in languages, then any other language file by code. */
+function languageCodes() {
+  const codes = Object.keys(LANGS);
+  return LANG_ORDER.filter((c) => codes.includes(c)).concat(codes.filter((c) => !LANG_ORDER.includes(c)).sort());
+}
+
+/* The language saved on this device if the page has it, else the quiz's default. */
+function pickLanguage(saved, available, fallback) {
+  return typeof saved === 'string' && available.includes(saved) ? saved : fallback;
+}
+
+function savedLanguage() {
+  try { return localStorage.getItem(LANG_KEY); } catch (e) { return null; }
+}
+
+function saveLanguage(code) {
+  try { localStorage.setItem(LANG_KEY, code); } catch (e) { /* the choice is not kept */ }
+}
+
 function setLanguage(code) {
   if (!LANGS[code]) code = CFG.language;
   LANG = code;
   T = LANGS[code].strings;
   LETTERS = LANGS[code].letters;
   PLURAL = new Intl.PluralRules(code);
+  const pick = document.getElementById('langPick');
+  pick.value = code;
+  for (const o of pick.options) o.toggleAttribute('selected', o.value === code);
   applyTexts();
   refreshCounts();
 }
@@ -682,6 +719,7 @@ function showScreen(name) {
   $('progWrap').hidden = name !== 'quiz';
   $('metaRow').hidden = name !== 'quiz';
   $('quitBtn').hidden = name !== 'quiz';
+  $('langPick').hidden = name !== 'setup';
   window.scrollTo(0, 0);
 }
 
@@ -952,6 +990,17 @@ $('actionBtn').addEventListener('click', () => {
 });
 $('skipBtn').addEventListener('click', () => { if (state) skip(); });
 $('themeBtn').addEventListener('click', toggleTheme);
+for (const code of languageCodes()) {
+  const o = document.createElement('option');
+  o.value = code;
+  o.lang = code;
+  o.textContent = LANGS[code].name;
+  $('langPick').appendChild(o);
+}
+$('langPick').addEventListener('change', () => {
+  setLanguage($('langPick').value);
+  saveLanguage(LANG);
+});
 $('quitBtn').addEventListener('click', goHome);
 $('resetBtn').addEventListener('click', () => {
   $('resetWrap').classList.add('hide');
@@ -976,7 +1025,7 @@ document.addEventListener('click', (ev) => {
   if (f) f.classList.toggle('zoom');
 });
 
-setLanguage(CFG.language);
+setLanguage(pickLanguage(savedLanguage(), languageCodes(), CFG.language));
 applyTheme(store.get()._theme);
 refreshStats();
 
@@ -1040,8 +1089,46 @@ async function selfTest() {
       assert(document.querySelector('#quiz pre.code'), 'code block not rendered');
       code = 1;
     }
+    step = 'lang-fallback';
+    const codes = languageCodes();
+    const last = codes[codes.length - 1];
+    assert(pickLanguage('xx', codes, CFG.language) === CFG.language, 'an unknown saved language is not ignored');
+    assert(pickLanguage(null, codes, CFG.language) === CFG.language, 'no saved language does not give the default');
+    assert(pickLanguage(last, codes, CFG.language) === last, 'a saved language is not used');
+    for (const c of codes) {
+      step = 'lang ' + c;
+      goHome();
+      setLanguage(c);
+      assert(LANG === c && $('langPick').value === c, 'not switched');
+      for (const el of document.querySelectorAll('[data-t], #simDesc, .csub')) {
+        const t = el.textContent;
+        assert(t.trim() || (el.dataset.t === undefined && !el.id), 'empty text in ' + (el.dataset.t || el.id));
+        assert(!/undefined|\[object|\{[a-z]+\}/i.test(t), 'bad text "' + t + '"');
+        assert(el.lang === c, 'lang of ' + (el.dataset.t || el.id) + ' is ' + el.lang);
+      }
+      const rules = new Intl.PluralRules(c);
+      for (const [k, v] of Object.entries(LANGS[c].strings)) {
+        if (!v || typeof v !== 'object' || Array.isArray(v)) continue;
+        for (const n of [0, 1, 2, 3, 5, 11, 12, 21, 22, 25, 101, 111]) {
+          assert(rules.select(n) in v, 'plural ' + k + ' has no "' + rules.select(n) + '" form (n=' + n + ')');
+        }
+      }
+    }
+    step = 'lang-quiz';
+    const other = codes.find((c) => c !== CFG.language);
     goHome();
-    return 'SELFTEST OK modes=3 sim=' + expected + ' img=' + img + ' code=' + code;
+    setLanguage(other);
+    start('learn', 'all');
+    clickFirst();
+    const action = $('actionBtn').textContent;
+    assert(action === T.next || action === T.finish, 'action button "' + action + '" is not in ' + other);
+    const head = document.querySelector('#explainBox .explain .head').textContent;
+    assert([T.correct, T.wrong, T.wrongExam, T.noAnswer].includes(head), 'verdict "' + head + '" is not in ' + other);
+    assert($('langPick').hidden, 'switcher shown during a quiz');
+    goHome();
+    assert(!$('langPick').hidden, 'switcher hidden on the start screen');
+    setLanguage(CFG.language);
+    return 'SELFTEST OK modes=3 sim=' + expected + ' img=' + img + ' code=' + code + ' langs=' + codes.length;
   } catch (e) {
     return 'SELFTEST FAIL ' + step + ': ' + e.message;
   }

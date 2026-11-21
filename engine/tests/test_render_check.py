@@ -156,3 +156,17 @@ def test_selftest_each_default_language(tmp_path, lang):
     s = (q / "quiz.toml").read_text(encoding="utf-8").replace('language = "sr-Latn"', f'language = "{lang}"')
     (q / "quiz.toml").write_text(s, encoding="utf-8")
     assert render(build_quiz(tmp_path, q)).startswith("SELFTEST OK modes=3 sim=3")
+
+
+def test_selftest_reports_languages(tmp_path):
+    out = build_quiz(tmp_path, MINI)
+    res = render(out)
+    assert res.startswith("SELFTEST OK") and " langs=4" in res, res
+    assert render(out, nostorage=True).startswith("SELFTEST OK")
+
+
+def test_switcher_markup(tmp_path):
+    dom = dump_dom(build_quiz(tmp_path, MINI))
+    assert re.search(r'<select[^>]*id="langPick"', dom)
+    assert re.findall(r'<option value="([^"]+)"', dom) == ["en", "sr-Latn", "sr-Cyrl", "ru"]
+    assert re.search(r'<option value="sr-Latn"[^>]*selected', dom)
