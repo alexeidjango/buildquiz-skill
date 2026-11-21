@@ -170,3 +170,14 @@ def test_switcher_markup(tmp_path):
     assert re.search(r'<select[^>]*id="langPick"', dom)
     assert re.findall(r'<option value="([^"]+)"', dom) == ["en", "sr-Latn", "sr-Cyrl", "ru"]
     assert re.search(r'<option value="sr-Latn"[^>]*selected', dom)
+
+
+def test_missing_result_line_is_retried_once(monkeypatch, tmp_path):
+    import subprocess
+    import render_check
+    outputs = iter(["<html></html>", '<pre id="selftest">SELFTEST OK modes=3</pre>'])
+    monkeypatch.setattr(render_check, "_run", lambda path, fragment: subprocess.CompletedProcess([], 0, next(outputs), ""))
+    assert render_check.render(tmp_path / "x.html") == "SELFTEST OK modes=3"
+    outputs = iter(["<html></html>", "<html></html>"])
+    with pytest.raises(RuntimeError):
+        render_check.render(tmp_path / "x.html")

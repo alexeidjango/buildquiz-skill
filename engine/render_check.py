@@ -47,9 +47,14 @@ def dump_dom(html_path: Path, fragment: str = "") -> str:
 def render(html_path: Path, nostorage: bool = False) -> str:
     """The self-test result line, e.g. "SELFTEST OK modes=3 sim=30 img=0 code=0" or "SELFTEST FAIL <step>: ...".
 
-    Raises RuntimeError (with the browser's stderr) when the page produced no result line."""
-    r = _run(html_path, "#selftest-nostorage" if nostorage else "#selftest")
-    m = re.search(r'<pre id="selftest">(.*?)</pre>', r.stdout, re.S)
+    Raises RuntimeError (with the browser's stderr) when the page produced no result line, twice: headless Edge
+    rarely dumps the page before the asynchronous self-test has written its line (about 1 load in 500), so a
+    missing line gets one more run. A SELFTEST FAIL line is never retried."""
+    for _ in range(2):
+        r = _run(html_path, "#selftest-nostorage" if nostorage else "#selftest")
+        m = re.search(r'<pre id="selftest">(.*?)</pre>', r.stdout, re.S)
+        if m:
+            break
     if not m:
         raise RuntimeError(f"no self-test result in the page (exit {r.returncode}): {r.stderr[-2000:]}")
     return html.unescape(m.group(1)).strip()
