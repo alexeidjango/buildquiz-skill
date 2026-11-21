@@ -1,0 +1,19 @@
+# Demo quiz: a worked example of a quiz folder, and the source of the README screenshots.
+# Build it with: python engine/build.py examples/demo-quiz --out <file.html>
+title = "Solar System"
+heading = "Solar System"
+subtitle = "Demo"
+intro = "A small demo quiz about the Solar System. Every explanation cites the lesson notes it comes from."
+storage_key = "demo-solar-v1"
+output = "demo.html"
+citation = 'notes §\d+'
+language = "en"
+
+[areas]
+P = "Planets"
+S = "The Sun and the Moon"
+O = "Orbits and seasons"
+
+[simulation]
+pass_mark = 6
+count = 10

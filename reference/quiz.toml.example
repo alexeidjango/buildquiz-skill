@@ -1,0 +1,35 @@
+# quiz.toml: settings of one quiz (annotated example: a university network-security exam, Serbian slides).
+# Regexes go in single quotes (TOML literal strings): in "double quotes" \b becomes a backspace.
+
+title = "ZRM K2"                    # <title>, short
+heading = "ZRM"                     # h1
+subtitle = "Kolokvijum 2"           # next to the h1
+intro = "Zaštita u računarskim mrežama, K2: ... Pitanje nosi poen samo ako je izbor tačan u celosti."  # lede paragraph
+storage_key = "zrmk2-v1"            # localStorage key for progress; bump when question ids change
+output = "quiz_zrm_k2.html"         # built file, must end in .html
+citation = '\bP[567]\b|[Oo]pšte znanje'  # every why must match this (unless the question has off_source=True)
+                                    #   slides: '\bP[234]\b'   book pages: 'стр\. \d+' or 'p\. \d+'
+                                    #   add '|[Oo]pšte znanje' (or '|general knowledge') if wrong options may be
+                                    #   explained from general knowledge
+language = "sr-Latn"                # default screen language: a file in engine/lang/ (en, sr-Latn, sr-Cyrl, ru, ...).
+                                    #   The person taking the quiz can switch it on the start screen.
+content_language = "sr-Latn"        # optional: the language the questions are written in (default: language).
+                                    #   Goes on the page's lang attribute (screen readers, Serbian vs Russian glyphs).
+# cyrillic_only = true              # optional: no Latin letters allowed in questions, options, explanations,
+                                    #   notes, title/heading/subtitle/intro, area labels
+# latin_allowed = ["n", "2n"]       # optional, with cyrillic_only: Latin tokens allowed in visible text
+# off_source_label = "van ovih strana"  # optional: tag on off_source=True questions, in every screen language.
+                                    #   Without it the tag comes from the screen language ("not on the slides").
+                                    #   Book quizzes set it, e.g. „ван ових страна“ / "not in these pages".
+artifact = ""                       # filled in after the first publish; rebuilds publish to this URL
+
+[areas]                             # 2 to 7 areas; one uppercase ASCII letter each; order = button order
+K = "Kriptografija"
+V = "VPN i IPsec"
+B = "Bežične mreže"
+
+[simulation]
+pass_mark = 15                      # optional: pass mark. Without it the third mode is the learning check
+                                    #   "Knowledge check" (score + message, no pass/fail)
+count = 30                          # either count: N random questions from the whole bank ...
+# mix = { K = 10, V = 10, B = 10 }  # ... or mix: a fixed number per area (not both)
